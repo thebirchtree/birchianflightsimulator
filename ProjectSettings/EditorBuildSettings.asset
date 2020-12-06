@@ -33,7 +33,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Snowy.unity
     guid: 51a21c1591d5d4b4f8ba60e1165f7183
   - enabled: 1
-    path: Assets/Space.unity
+    path: Assets/Scenes/Space.unity
     guid: e55d94dd2896a40f1b0a69505c2dc519
   - enabled: 1
     path: Assets/Assets/ASSET/Scenes/Scene Air Old.unity
@@ -57,7 +57,7 @@ EditorBuildSettings:
     path: Assets/Assets/ASSET/LAN.unity
     guid: 694675ab34a1744a481fe7f600108188
   - enabled: 1
-    path: Assets/RebM.unity
+    path: Assets/Scenes/RebM.unity
     guid: aa818f5490062554f9311ca43e44c8ea
   - enabled: 0
     path: Assets/Scenes/TP.unity
@@ -66,7 +66,7 @@ EditorBuildSettings:
     path: Assets/Scenes/IslandX1.unity
     guid: ffa358a5762b94c24a5ad1eb17cb6193
   - enabled: 0
-    path: Assets/RebM2.unity
+    path: Assets/Scenes/RebM2.unity
     guid: cfb37a2e61b76724e918c705895865dc
   - enabled: 0
     path: Assets/MenuN.unity
@@ -75,6 +75,6 @@ EditorBuildSettings:
     path: Assets/X.unity
     guid: 214b8980aa67ee44595c7d85ab39facf
   - enabled: 0
-    path: Assets/Space2.unity
+    path: Assets/Scenes/Space2.unity
     guid: ef41086954b0ee44c857ca593f1bf8b9
   m_configObjects: {}
