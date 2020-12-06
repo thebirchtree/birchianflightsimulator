@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9d49609734f78c40becab2d9ba18a24, type: 3}
+  m_Name: BFS Steamworks Inventory Settings
+  m_EditorClassIdentifier: 
+  LogDebugMessages: 0
+  ItemDefinitions:
+  - {fileID: 11400000, guid: 537e71e9d613290479216f04e9240ba7, type: 2}
+  - {fileID: 11400000, guid: 352588ea955d22e4fae7aac27f14a117, type: 2}
+  - {fileID: 11400000, guid: e4c239bc28515d244a4bbc6f10996141, type: 2}
+  - {fileID: 11400000, guid: 7d0819f4c63f10d419e057994d69e311, type: 2}
+  - {fileID: 11400000, guid: e81e1c4076641b840a38cad7bb606b4b, type: 2}
+  ItemGenerators:
+  - {fileID: 11400000, guid: a00782ac17b1ba541a4e432345128be3, type: 2}
+  - {fileID: 11400000, guid: 3a4816799d374604295660c1723e0a7e, type: 2}
+  - {fileID: 11400000, guid: cf1b1ea342fd7ad478f48df9282ca065, type: 2}
+  TagGenerators: []
+  ItemBundles:
+  - {fileID: 11400000, guid: b660846fec0d2f643bb42eac24d1c161, type: 2}
+  - {fileID: 11400000, guid: 87a3639e52f08c740bc7d3d20185f1d5, type: 2}
+  - {fileID: 11400000, guid: cc85452c3bedf1f42ac12cc560841d1c, type: 2}
+  - {fileID: 11400000, guid: 16ee1ea416cf0534ca102032cb8033b4, type: 2}
+  - {fileID: 11400000, guid: 84c209e5be7c0324b81930dd7b055a54, type: 2}
+  ItemInstancesUpdated:
+    m_PersistentCalls:
+      m_Calls: []
+  ItemsGranted:
+    m_PersistentCalls:
+      m_Calls: []
+  ItemsConsumed:
+    m_PersistentCalls:
+      m_Calls: []
+  ItemsExchanged:
+    m_PersistentCalls:
+      m_Calls: []
+  ItemsDroped:
+    m_PersistentCalls:
+      m_Calls: []

@@ -1,0 +1,171 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4300912345703891378
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4300912345703891380}
+  - component: {fileID: 4300912345703891381}
+  - component: {fileID: 4300912345703891385}
+  - component: {fileID: 4300912345703891382}
+  - component: {fileID: 4300912345703891383}
+  - component: {fileID: 7251413416362104136}
+  m_Layer: 0
+  m_Name: STEAMMAN
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4300912345703891380
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4300912345703891378}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 34.56, y: 9.087002, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4300912345703891381
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4300912345703891378}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef4bffeda13d7a748973ff9204401c07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &4300912345703891385
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4300912345703891378}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e199e0052473a9d40b85f57bdc651a0f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Settings: {fileID: 11400000, guid: 71e311c3a07761344a82adb96977bb7d, type: 2}
+  _doNotDistroyOnLoad:
+    Mode: 0
+    m_constantValue: 1
+    Variable: {fileID: 0}
+  _Initialized:
+    Mode: 0
+    m_constantValue: 0
+    Variable: {fileID: 0}
+  OnSteamInitalized:
+    m_PersistentCalls:
+      m_Calls: []
+  OnSteamInitalizationError:
+    m_PersistentCalls:
+      m_Calls: []
+  OnOverlayActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  OnUserStatsRecieved:
+    m_PersistentCalls:
+      m_Calls: []
+  OnUserStatsStored:
+    m_PersistentCalls:
+      m_Calls: []
+  OnNumberOfCurrentPlayersResult:
+    m_PersistentCalls:
+      m_Calls: []
+  OnAchievementStored:
+    m_PersistentCalls:
+      m_Calls: []
+  OnAvatarLoaded:
+    m_PersistentCalls:
+      m_Calls: []
+  OnPersonaStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRecievedFriendChatMessage:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &4300912345703891382
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4300912345703891378}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96247c0f30c2a83458c634809d545cb9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Leaderboards: []
+  LeaderboardRankChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  LeaderboardRankLoaded:
+    m_PersistentCalls:
+      m_Calls: []
+  LeaderboardNewHighRank:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &4300912345703891383
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4300912345703891378}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aebefb22a884592479d475cb595cfe60, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Settings: {fileID: 11400000, guid: 1ff2dde50e0b5984f8947328bb589acd, type: 2}
+  RefreshOnStart: 0
+  ItemInstancesUpdated:
+    m_PersistentCalls:
+      m_Calls: []
+  ItemsGranted:
+    m_PersistentCalls:
+      m_Calls: []
+  ItemsConsumed:
+    m_PersistentCalls:
+      m_Calls: []
+  ItemsExchanged:
+    m_PersistentCalls:
+      m_Calls: []
+  ItemsDroped:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &7251413416362104136
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4300912345703891378}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5bf1b38629b3e084ea1ab2e0c85b04a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GameDataModel: []
+  SteamDataFilesIndex: []
+  FileReadAsyncComplete:
+    m_PersistentCalls:
+      m_Calls: []
+  FileWriteAsyncComplete:
+    m_PersistentCalls:
+      m_Calls: []

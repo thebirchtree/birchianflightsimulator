@@ -1,0 +1,150 @@
+{
+	"appid": 1007950,
+	"items": [
+	{
+		"itemdefid": 10000,
+		"type": "item",
+		"name_english": "Gold",
+		"drop_window": 1440,
+		"description": "",
+		"icon_url": "https://birchcorp.weebly.com/uploads/1/0/6/2/106235821/goldbarsmall_orig.png",
+		"icon_url_large": "https://birchcorp.weebly.com/uploads/1/0/6/2/106235821/goldbarbig_orig.png",
+		"marketable": true,
+		"tradable": true,
+		"tags": "Category:Tag",
+		"store_tags": "",
+		"drop_interval": 10080,
+		"use_drop_limit": true,
+		"store_hidden": false,
+		"exchange": "5000x10000"
+	},
+	{
+		"itemdefid": 20000,
+		"type": "item",
+		"granted_manually": true,
+		"exchange": "10000x10000"
+	},
+	{
+		"itemdefid": 5000,
+		"type": "item",
+		"name_english": "Iron Bar",
+		"description_english": "The iron bar of Birchian Flight Simulator, the most common currency",
+		"icon_url": "https://birchcorp.weebly.com/uploads/1/0/6/2/106235821/ironsmall_orig.png",
+		"icon_url_large": "https://birchcorp.weebly.com/uploads/1/0/6/2/106235821/ironbarbig_orig.png",
+		"marketable": true,
+		"tradable": false,
+		"store_tags": "common",
+		"store_hidden": false,
+		"item_slot": "Currency",
+		"granted_manually": false,
+		"drop_interval": 15,
+		"drop_window": 1440,
+		"drop_max_per_winidow": 50,
+		"use_drop_limit": true
+	},
+	{
+		"itemdefid": 11000,
+		"type": "item",
+		"name_english": "Granted Gold\n",
+		"hidden": true,
+		"store_hidden": true,
+		"granted_manually": true
+	},
+	{
+		"itemdefid": 1,
+		"type": "item",
+		"name_english": "Red Missile\n",
+		"description_english": "A Red Missile for BFS",
+		"icon_url": "",
+		"icon_url_large": "",
+		"marketable": true,
+		"tradable": true,
+		"tags": "Category:Tag",
+		"store_tags": "Missile;Common",
+		"hidden": false,
+		"store_hidden": false,
+		"exchange": "5000x50"
+	},
+	{
+		"itemdefid": 10005,
+		"type": "generator",
+		"name_english": "Gold Generator",
+		"bundle": "10001x10;10002x5;10003x3"
+	},
+	{
+		"itemdefid": 5005,
+		"type": "generator",
+		"name_english": "Iron Generator\n",
+		"bundle": "5000x10000;5001x100"
+	},
+	{
+		"itemdefid": 20005,
+		"type": "generator",
+		"name_english": "Purified Gold Generator\n",
+		"exchange": "10000x10000",
+		"bundle": "20000x1"
+	},
+	{
+		"itemdefid": 10001,
+		"type": "bundle",
+		"name_english": "Gold",
+		"description_english": "The Standard Currency in Birchian Flight Simulator",
+		"icon_url": "",
+		"icon_url_large": "",
+		"marketable": true,
+		"tradable": true,
+		"tags": "",
+		"store_tags": "",
+		"purchase_bundle_discount": 0,
+		"store_hidden": true,
+		"price": "1;USD090",
+		"bundle": "10000x100"
+	},
+	{
+		"itemdefid": 10003,
+		"type": "bundle",
+		"name_english": "Gold",
+		"description_english": "The Premium Currency in Birchian Flight Simulator",
+		"icon_url": "",
+		"icon_url_large": "",
+		"marketable": true,
+		"tradable": true,
+		"tags": "",
+		"store_tags": "",
+		"purchase_bundle_discount": 0,
+		"store_hidden": true,
+		"price": "1;USD700",
+		"bundle": "10000x1000"
+	},
+	{
+		"itemdefid": 10002,
+		"type": "bundle",
+		"name_english": "Gold",
+		"description_english": "The Standard Currency in Birchian Flight Simulator",
+		"icon_url": "",
+		"icon_url_large": "",
+		"marketable": true,
+		"tradable": true,
+		"tags": "",
+		"store_tags": "",
+		"purchase_bundle_discount": 0,
+		"price": "1;USD300",
+		"store_hidden": true,
+		"bundle": "10000x500"
+	},
+	{
+		"itemdefid": 20001,
+		"type": "bundle",
+		"price": "8;USD6000",
+		"exchange": "10000x10000",
+		"bundle": "20000x1"
+	},
+	{
+		"itemdefid": 5001,
+		"type": "bundle",
+		"price": "1;USD025",
+		"name_english": "100 Iron",
+		"bundle": "5000x100"
+	}
+	]
+}

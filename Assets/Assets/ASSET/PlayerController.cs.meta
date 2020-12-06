@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: e24d290d9c22f4e0e960713684128b7c
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - countText: {instanceID: 0}
+  - winText: {instanceID: 0}
+  - WinGO: {fileID: 1817256527505832, guid: b920b9bcd783d456b93afe60fb38e052, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

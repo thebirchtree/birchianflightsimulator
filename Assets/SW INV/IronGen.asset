@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5cd841f08814aa4ea5c3d33b387b222, type: 3}
+  m_Name: IronGen
+  m_EditorClassIdentifier: 
+  DeveloperDescription: 
+  DefinitionID:
+    m_SteamItemDef: 5005
+  Recipes: []
+  ValveItemDefAttributes:
+  - attribute: 0
+    language: 8
+    stringValue: 'Iron Generator
+
+'
+    boolValue: 0
+    colorValue: {r: 0, g: 0, b: 0, a: 0}
+    intValue: 0
+    stringArray: []
+    priceDataValue:
+      version: 1
+      values: []
+    priceCategoryValue:
+      version: 1
+      price: 3
+    promoRulesValue: []
+    inventoryTagValue: []
+    tagGeneratorValue: []
+  Content:
+  - Item: {fileID: 11400000, guid: e4c239bc28515d244a4bbc6f10996141, type: 2}
+    Count: 10000
+  - Item: {fileID: 11400000, guid: 84c209e5be7c0324b81930dd7b055a54, type: 2}
+    Count: 100

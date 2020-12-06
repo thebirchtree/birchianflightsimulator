@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: d1da501b5e33f454a8406004cd3de0db
+timeCreated: 1511224671
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - moneyText: {instanceID: 0}
+  - rifle: {fileID: 1615152963212640, guid: 893873782b46943f89566bb05d4b9d07, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
