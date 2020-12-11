@@ -9,7 +9,6 @@ using UnityEngine.Events;
 
 namespace HeathenEngineering.SteamApi.Networking
 {
-    [Serializable]
-    public class SteamServerDisconnectedEvent : UnityEvent<SteamServersDisconnected_t> { }
+    
 }
 #endif

@@ -19,7 +19,7 @@ namespace HeathenEngineering.SteamApi.PlayerServices
         /// <summary>
         /// Metadata regarding the Steam Data File including its location, size, name and time stamps.
         /// </summary>
-        public SteamDataFileAddress address;
+        public SteamworksRemoteStorageManager.FileAddress address;
         /// <summary>
         /// The binary data of the file in question.
         /// </summary>
@@ -41,6 +41,8 @@ namespace HeathenEngineering.SteamApi.PlayerServices
         [HideInInspector]
         public SteamDataLibrary linkedLibrary;
 
+        public Action<SteamDataFile> Complete;
+
         /// <summary>
         /// Reads the data from a SteamDataLibrary into the byte[] in preperation for submiting the data to the Steam Remote Storage system.
         /// </summary>
@@ -61,12 +63,22 @@ namespace HeathenEngineering.SteamApi.PlayerServices
             dataLibrary.SyncFromBuffer(binaryData);
         }
 
+        /// <summary>
+        /// Sets the binary data of the file equal to the encoded form of the <paramref name="jsonObject"/>
+        /// </summary>
+        /// <param name="jsonObject">The object to be encoded, this can be any type that is supported by UnityEngine.JsonUtility.</param>
+        /// <param name="encoding">The encoding format to use on the resulting JSON string when converting it to a byte[] ... this would typically be System.Text.Encoding.UTF8</param>
+        public void SetDataFromObject(object jsonObject, System.Text.Encoding encoding)
+        {
+            binaryData = encoding.GetBytes(JsonUtility.ToJson(jsonObject));
+        }
+
         #region Encoding
         /// <summary>
         /// Encodes the binary data into UTF8
         /// </summary>
         /// <returns></returns>
-        public string EncodeUTF8()
+        public string FromUTF8()
         {
             if (binaryData.Length > 0)
                 return System.Text.Encoding.UTF8.GetString(binaryData);
@@ -77,7 +89,7 @@ namespace HeathenEngineering.SteamApi.PlayerServices
         /// Encodes the binary data into UTF32
         /// </summary>
         /// <returns></returns>
-        public string EncodeUTF32()
+        public string FromUTF32()
         {
             if (binaryData.Length > 0)
                 return System.Text.Encoding.UTF32.GetString(binaryData);
@@ -88,7 +100,7 @@ namespace HeathenEngineering.SteamApi.PlayerServices
         /// Encodes the binary data into Unicode
         /// </summary>
         /// <returns></returns>
-        public string EncodeUnicode()
+        public string FromUnicode()
         {
             if (binaryData.Length > 0)
                 return System.Text.Encoding.Unicode.GetString(binaryData);
@@ -99,7 +111,7 @@ namespace HeathenEngineering.SteamApi.PlayerServices
         /// Econdes the binary data into the system default encoding this will be platform dependent
         /// </summary>
         /// <returns></returns>
-        public string EncodeDefault()
+        public string FromDefaultEncoding()
         {
             if (binaryData.Length > 0)
                 return System.Text.Encoding.Default.GetString(binaryData);
@@ -110,14 +122,67 @@ namespace HeathenEngineering.SteamApi.PlayerServices
         /// Encodes the binary data into ASCII
         /// </summary>
         /// <returns></returns>
-        public string EncodeASCII()
+        public string FromASCII()
         {
             if (binaryData.Length > 0)
                 return System.Text.Encoding.ASCII.GetString(binaryData);
             else
                 return string.Empty;
         }
+
+        public string FromEncoding(System.Text.Encoding encoding)
+        {
+            return encoding.GetString(binaryData);
+        }
+
+        /// <summary>
+        /// Treats the binary data as a JSON object stored with the indicated encoding and uses the <see cref="JsonUtility"/> to deserialize it
+        /// </summary>
+        /// <typeparam name="T">The type to deserialize to</typeparam>
+        /// <param name="encoding">The encoding to encode the byte array with ... this is typically Encoding.UTF8</param>
+        /// <returns></returns>
+        public T FromJson<T>(System.Text.Encoding encoding)
+        {
+            return JsonUtility.FromJson<T>(encoding.GetString(binaryData));
+        }
         #endregion
+
+        public void HandleFileReadAsyncComplete(RemoteStorageFileReadAsyncComplete_t param, bool bIOFailure)
+        {
+            result = param.m_eResult;
+            //If the request result was okay fetch the binary data
+            if (result == EResult.k_EResultOK)
+            {
+                binaryData = new byte[address.fileSize];
+                if (!SteamRemoteStorage.FileReadAsyncComplete(param.m_hFileReadAsync, binaryData, (uint)binaryData.Length))
+                {
+                    //If we failed to read the binary data update the result to fail
+                    result = EResult.k_EResultFail;
+                }
+                else if (linkedLibrary != null)
+                {
+                    linkedLibrary.activeFile = this;
+                    WriteToLibrary(linkedLibrary);
+                }
+            }
+
+            if (Complete != null)
+                Complete.Invoke(this);
+        }
+
+        public void HandleFileWriteAsyncComplete(RemoteStorageFileWriteAsyncComplete_t param, bool bIOFailure)
+        {
+            result = param.m_eResult;
+            //If the request result was okay fetch the binary data
+            if (result == EResult.k_EResultOK && linkedLibrary != null)
+            {
+                linkedLibrary.activeFile = this;
+                WriteToLibrary(linkedLibrary);
+            }
+
+            if (Complete != null)
+                Complete.Invoke(this);
+        }
     }
 }
 #endif

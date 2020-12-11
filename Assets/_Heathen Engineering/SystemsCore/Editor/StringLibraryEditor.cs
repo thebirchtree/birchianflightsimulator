@@ -13,7 +13,6 @@ namespace HeathenEngineering.Scriptable.Editors
 
         int selectedManager = 0;
         int selectedLib = 0;
-        int selectedField = 0;
 
         List<string> managerNames = new List<string>();
         List<string> libNames = new List<string>();

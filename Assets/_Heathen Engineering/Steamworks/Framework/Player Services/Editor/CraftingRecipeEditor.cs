@@ -14,8 +14,6 @@ namespace HeathenEngineering.SteamApi.Editors
     {
         private SerializedProperty DeveloperDescription;
 
-        private int seTab = 0;
-
         private void OnEnable()
         {
             DeveloperDescription = serializedObject.FindProperty("DeveloperDescription");

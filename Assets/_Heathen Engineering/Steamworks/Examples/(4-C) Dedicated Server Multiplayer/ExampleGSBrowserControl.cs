@@ -52,7 +52,7 @@ namespace HeathenEngineering.SteamApi.Networking.Demo
         private void SetDefaultFilter()
         {
             browser.filter.Clear();
-            browser.filter.Add(new Steamworks.MatchMakingKeyValuePair_t() { m_szKey = "gamedataand", m_szValue = "AppId=" + browser.steamSettings.ApplicationId.m_AppId.ToString() });
+            browser.filter.Add(new Steamworks.MatchMakingKeyValuePair_t() { m_szKey = "gamedataand", m_szValue = "AppId=" + browser.steamSettings.applicationId.m_AppId.ToString() });
         }
 
         private void ClearChildren(Transform root)

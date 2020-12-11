@@ -34,7 +34,7 @@ namespace HeathenEngineering.SteamApi.Networking.Demo
 
         private void SayMyName(EventData data)
         {
-            lobbyChat.SendSystemMessage("Heathen Engineer", "Your name is " + steamSettings.UserData.DisplayName);
+            lobbyChat.SendSystemMessage("Heathen Engineer", "Your name is " + steamSettings.client.userData.DisplayName);
         }
     }
 }

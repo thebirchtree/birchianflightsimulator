@@ -308,22 +308,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e199e0052473a9d40b85f57bdc651a0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Settings: {fileID: 11400000, guid: e56f48543a769984c897a8b4ee49b69e, type: 2}
+  settings: {fileID: 11400000, guid: e56f48543a769984c897a8b4ee49b69e, type: 2}
   _doNotDistroyOnLoad:
     Mode: 0
-    ConstantValue: 0
+    m_constantValue: 0
     Variable: {fileID: 0}
-  _Initialized:
-    Mode: 0
-    ConstantValue: 0
-    Variable: {fileID: 0}
-  OnSteamInitalized:
+  onSteamInitalized:
     m_PersistentCalls:
       m_Calls: []
-  OnSteamInitalizationError:
+  onSteamInitalizationError:
     m_PersistentCalls:
       m_Calls: []
-  OnOverlayActivated:
+  onOverlayActivated:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1516153684}
@@ -337,7 +333,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  OnUserStatsRecieved:
+  onUserStatsRecieved:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
@@ -351,7 +347,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  OnUserStatsStored:
+  onUserStatsStored:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
@@ -365,21 +361,34 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  OnNumberOfCurrentPlayersResult:
+  onNumberOfCurrentPlayersResult:
     m_PersistentCalls:
       m_Calls: []
-  OnAchievementStored:
+  onAchievementStored:
     m_PersistentCalls:
       m_Calls: []
-  OnAvatarLoaded:
+  onAvatarLoaded:
     m_PersistentCalls:
       m_Calls: []
-  OnPersonaStateChanged:
+  onPersonaStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  OnRecievedFriendChatMessage:
+  onRecievedFriendChatMessage:
     m_PersistentCalls:
       m_Calls: []
+  gameServerShuttingDown:
+    m_PersistentCalls:
+      m_Calls: []
+  disconnected:
+    m_PersistentCalls:
+      m_Calls: []
+  connected:
+    m_PersistentCalls:
+      m_Calls: []
+  failure:
+    m_PersistentCalls:
+      m_Calls: []
+  networkManager: {fileID: 0}
 --- !u!4 &253577535
 Transform:
   m_ObjectHideFlags: 0
@@ -443,7 +452,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.000045776367, y: -0.000050544848}
+  m_AnchoredPosition: {x: 0.000015258789, y: 0.000010490308}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &423417646
@@ -983,6 +992,18 @@ PrefabInstance:
     - target: {fileID: 114090220194972458, guid: 199a4dac58b84ba42bff36758f23d2ba,
         type: 3}
       propertyPath: UserData
+      value: 
+      objectReference: {fileID: 11400000, guid: 1815039a2b5ac1843b9aa1a7712dfbdc,
+        type: 2}
+    - target: {fileID: 114090220194972458, guid: 199a4dac58b84ba42bff36758f23d2ba,
+        type: 3}
+      propertyPath: steamSettings
+      value: 
+      objectReference: {fileID: 11400000, guid: e56f48543a769984c897a8b4ee49b69e,
+        type: 2}
+    - target: {fileID: 114090220194972458, guid: 199a4dac58b84ba42bff36758f23d2ba,
+        type: 3}
+      propertyPath: userData
       value: 
       objectReference: {fileID: 11400000, guid: 1815039a2b5ac1843b9aa1a7712dfbdc,
         type: 2}
@@ -1813,8 +1834,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1902459098}
   m_HandleRect: {fileID: 1902459097}
   m_Direction: 2
-  m_Value: 1
-  m_Size: 0.9999998
+  m_Value: 0
+  m_Size: 0.99999964
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

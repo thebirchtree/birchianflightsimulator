@@ -35,7 +35,7 @@ namespace HeathenEngineering.SteamApi.PlayerServices
                 case ValveItemDefSchemaAttributes.background_color:
                     var bgColor = colorValue;
                     if (bgColor != null)
-                        return "\"background_color\": " + ColorUtility.ToHtmlStringRGB(bgColor);
+                        return "\"background_color\": \"" + ColorUtility.ToHtmlStringRGB(bgColor) + "\"";
                     else
                         return string.Empty;
                 case ValveItemDefSchemaAttributes.description:
@@ -47,7 +47,7 @@ namespace HeathenEngineering.SteamApi.PlayerServices
                 case ValveItemDefSchemaAttributes.drop_limit:
                     return "\"drop_limit\": " + intValue.ToString();
                 case ValveItemDefSchemaAttributes.drop_max_per_winidow:
-                    return "\"drop_max_per_winidow\": " + intValue.ToString();
+                    return "\"drop_max_per_window\": " + intValue.ToString();
                 case ValveItemDefSchemaAttributes.drop_start_time:
                     return "\"drop_start_time\": \"" + stringValue + "\"";
                 case ValveItemDefSchemaAttributes.drop_window:
@@ -71,7 +71,7 @@ namespace HeathenEngineering.SteamApi.PlayerServices
                 case ValveItemDefSchemaAttributes.name_color:
                     var nColor = colorValue;
                     if (nColor != null)
-                        return "\"name_color\": " + ColorUtility.ToHtmlStringRGB(nColor);
+                        return "\"name_color\": \"" + ColorUtility.ToHtmlStringRGB(nColor) + "\"";
                     else
                         return string.Empty;
                 case ValveItemDefSchemaAttributes.price:
@@ -174,7 +174,7 @@ namespace HeathenEngineering.SteamApi.PlayerServices
                         }
                         sb.Append("\"");
 
-                        return "\"tag_generators\": \"" + sb.ToString() + "\"";
+                        return "\"tag_generators\": " + sb.ToString();
                     }
                     else
                         return string.Empty;

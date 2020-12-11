@@ -57,14 +57,14 @@ namespace HeathenEngineering.SteamApi.Foundation.UI
                 if(image == null)
                     image = GetComponent<UnityEngine.UI.RawImage>();
 
-                image.texture = userData.Avatar;
+                image.texture = userData.avatar;
                 userData.OnAvatarChanged.AddListener(handleAvatarChange);
             }
         }
 
         private void handleAvatarChange()
         {
-            image.texture = userData.Avatar;
+            image.texture = userData.avatar;
         }
 
         private void OnDestroy()

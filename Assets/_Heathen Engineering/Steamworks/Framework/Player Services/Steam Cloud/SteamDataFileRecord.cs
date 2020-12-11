@@ -30,7 +30,7 @@ namespace HeathenEngineering.SteamApi.PlayerServices.UI
         /// <summary>
         /// The address of this specific file on the Steam Remote Storage system.
         /// </summary>
-        public SteamDataFileAddress Address;
+        public SteamworksRemoteStorageManager.FileAddress Address;
         /// <summary>
         /// A pointer back to the parent <see cref="SteamDataFileList"/>
         /// </summary>

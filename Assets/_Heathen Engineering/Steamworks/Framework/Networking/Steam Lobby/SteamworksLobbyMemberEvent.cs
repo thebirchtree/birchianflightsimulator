@@ -3,6 +3,7 @@
 #endif
 
 #if !DISABLESTEAMWORKS
+using Steamworks;
 using System;
 using UnityEngine.Events;
 
@@ -10,6 +11,10 @@ namespace HeathenEngineering.SteamApi.Networking
 {
     [Serializable]
     public class SteamworksLobbyMemberEvent : UnityEvent<SteamworksLobbyMember>
+    { }
+
+    [Serializable]
+    public class SteamworksSteamIDEvent : UnityEvent<CSteamID>
     { }
 }
 #endif

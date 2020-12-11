@@ -31,37 +31,56 @@ namespace HeathenEngineering.SteamApi.Editors
         public Texture2D statIcon;
         public Texture2D dropBoxTexture;
 
-
-        private int tabPage = 0;
         private int appTabPage = 0;
         private int seTab = 0;
 
         private void OnEnable()
         {
-            Settings = serializedObject.FindProperty("Settings");
-            
-            DoNotDestroyOnLoad = serializedObject.FindProperty("_doNotDistroyOnLoad");
-            OnSteamInitalized = serializedObject.FindProperty("OnSteamInitalized");
-            OnSteamInitalizationError = serializedObject.FindProperty("OnSteamInitalizationError");
-            OnOverlayActivated = serializedObject.FindProperty("OnOverlayActivated");
+            Settings = serializedObject.FindProperty(nameof(SteamworksFoundationManager.settings));
+                        
+            DoNotDestroyOnLoad = serializedObject.FindProperty(nameof(SteamworksFoundationManager._doNotDistroyOnLoad));
+            OnSteamInitalized = serializedObject.FindProperty(nameof(SteamworksFoundationManager.onSteamInitalized));
+            OnSteamInitalizationError = serializedObject.FindProperty(nameof(SteamworksFoundationManager.onSteamInitalizationError));
+            OnOverlayActivated = serializedObject.FindProperty(nameof(SteamworksFoundationManager.onOverlayActivated));
 
-            OnUserStatsRecieved = serializedObject.FindProperty("OnUserStatsRecieved");
-            OnUserStatsStored = serializedObject.FindProperty("OnUserStatsStored");
-            OnAchievementStored = serializedObject.FindProperty("OnAchievementStored");
-            OnAvatarLoaded = serializedObject.FindProperty("OnAvatarLoaded");
-            OnPersonaStateChanged = serializedObject.FindProperty("OnPersonaStateChanged");
-            OnRecievedFriendChatMessage = serializedObject.FindProperty("OnRecievedFriendChatMessage");
+            OnUserStatsRecieved = serializedObject.FindProperty(nameof(SteamworksFoundationManager.onUserStatsRecieved));
+            OnUserStatsStored = serializedObject.FindProperty(nameof(SteamworksFoundationManager.onUserStatsStored));
+            OnAchievementStored = serializedObject.FindProperty(nameof(SteamworksFoundationManager.onAchievementStored));
+            OnAvatarLoaded = serializedObject.FindProperty(nameof(SteamworksFoundationManager.onAvatarLoaded));
+            OnPersonaStateChanged = serializedObject.FindProperty(nameof(SteamworksFoundationManager.onPersonaStateChanged));
+            OnRecievedFriendChatMessage = serializedObject.FindProperty(nameof(SteamworksFoundationManager.onRecievedFriendChatMessage));
 
-            OnNumberOfCurrentPlayersResult = serializedObject.FindProperty("OnNumberOfCurrentPlayersResult");
+            OnNumberOfCurrentPlayersResult = serializedObject.FindProperty(nameof(SteamworksFoundationManager.onNumberOfCurrentPlayersResult));
         }
 
         public override void OnInspectorGUI()
         { 
             pManager = target as SteamworksFoundationManager;
 
+            if (pManager != null)
+            {
+                if(pManager.settings != null)
+                {
+                    if (pManager.settings.client == null)
+                        pManager.settings.client = new SteamSettings.GameClient();
+
+                    if (pManager.settings.server == null)
+                        pManager.settings.server = new SteamSettings.GameServer();
+
+                    if (pManager.settings.client.achievements == null)
+                        pManager.settings.client.achievements = new System.Collections.Generic.List<SteamAchievementData>();
+
+                    if (pManager.settings.client.stats == null)
+                        pManager.settings.client.stats = new System.Collections.Generic.List<SteamStatData>();
+
+                    pManager.settings.client.stats.RemoveAll(p => p == null);
+                    pManager.settings.client.achievements.RemoveAll(p => p == null);
+                }
+            }
+
             EditorGUILayout.PropertyField(Settings);
 
-            if (pManager.Settings == null)
+            if (pManager.settings == null)
             {
                 EditorGUILayout.Space();
                 EditorGUILayout.LabelField("Assign a Steam Settings object to get started!");
@@ -77,7 +96,7 @@ namespace HeathenEngineering.SteamApi.Editors
 
                 if (seTab == 0)
                 {
-                    if (pManager.Settings != null)
+                    if (pManager.settings != null)
                     {
                         GeneralDropAreaGUI("... Drop Stats & Achievments Here ...", pManager);
 
@@ -94,7 +113,7 @@ namespace HeathenEngineering.SteamApi.Editors
                 }
                 else
                 {
-                    if (pManager.Settings != null)
+                    if (pManager.settings != null)
                     {
 
                         EditorGUILayout.BeginHorizontal();
@@ -137,13 +156,13 @@ namespace HeathenEngineering.SteamApi.Editors
 
         private void DrawSteamUserData(SteamworksFoundationManager pManager)
         {
-            if(pManager.Settings == null)
+            if(pManager.settings == null)
             {
                 EditorGUILayout.HelpBox("Requires Steam Settings", MessageType.Info);
                 return;
             }
 
-            if(pManager.Settings.UserData == null)
+            if(pManager.settings.client.userData == null)
             {
                 EditorGUILayout.HelpBox("Requires you reference a Steam User Data object in your Steam Settings", MessageType.Info);
                 return;
@@ -151,59 +170,59 @@ namespace HeathenEngineering.SteamApi.Editors
 
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.PrefixLabel("Steam Id");
-            EditorGUILayout.LabelField(pManager != null ? pManager.Settings.UserData.SteamId.m_SteamID.ToString() : "unknown");
+            EditorGUILayout.LabelField(pManager != null ? pManager.settings.client.userData.id.m_SteamID.ToString() : "unknown");
             EditorGUILayout.EndHorizontal();
 
-            if (pManager.Settings.UserData.State == Steamworks.EPersonaState.k_EPersonaStateAway)
+            if (pManager.settings.client.userData.State == Steamworks.EPersonaState.k_EPersonaStateAway)
             {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.PrefixLabel("Status");
                 EditorGUILayout.LabelField("Away");
                 EditorGUILayout.EndHorizontal();
             }
-            else if (pManager.Settings.UserData.State == Steamworks.EPersonaState.k_EPersonaStateBusy)
+            else if (pManager.settings.client.userData.State == Steamworks.EPersonaState.k_EPersonaStateBusy)
             {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.PrefixLabel("Status");
                 EditorGUILayout.LabelField("Busy");
                 EditorGUILayout.EndHorizontal();
             }
-            else if (pManager.Settings.UserData.State == Steamworks.EPersonaState.k_EPersonaStateLookingToPlay)
+            else if (pManager.settings.client.userData.State == Steamworks.EPersonaState.k_EPersonaStateLookingToPlay)
             {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.PrefixLabel("Status");
                 EditorGUILayout.LabelField("Looking to Play");
                 EditorGUILayout.EndHorizontal();
             }
-            else if (pManager.Settings.UserData.State == Steamworks.EPersonaState.k_EPersonaStateLookingToTrade)
+            else if (pManager.settings.client.userData.State == Steamworks.EPersonaState.k_EPersonaStateLookingToTrade)
             {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.PrefixLabel("Status");
                 EditorGUILayout.LabelField("Looking to Trade");
                 EditorGUILayout.EndHorizontal();
             }
-            else if (pManager.Settings.UserData.State == Steamworks.EPersonaState.k_EPersonaStateMax)
+            else if (pManager.settings.client.userData.State == Steamworks.EPersonaState.k_EPersonaStateMax)
             {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.PrefixLabel("Status");
                 EditorGUILayout.LabelField("Max");
                 EditorGUILayout.EndHorizontal();
             }
-            else if (pManager.Settings.UserData.State == Steamworks.EPersonaState.k_EPersonaStateOffline)
+            else if (pManager.settings.client.userData.State == Steamworks.EPersonaState.k_EPersonaStateOffline)
             {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.PrefixLabel("Status");
                 EditorGUILayout.LabelField("Offline");
                 EditorGUILayout.EndHorizontal();
             }
-            else if (pManager.Settings.UserData.State == Steamworks.EPersonaState.k_EPersonaStateOnline)
+            else if (pManager.settings.client.userData.State == Steamworks.EPersonaState.k_EPersonaStateOnline)
             {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.PrefixLabel("Status");
                 EditorGUILayout.LabelField("Online");
                 EditorGUILayout.EndHorizontal();
             }
-            else if (pManager.Settings.UserData.State == Steamworks.EPersonaState.k_EPersonaStateSnooze)
+            else if (pManager.settings.client.userData.State == Steamworks.EPersonaState.k_EPersonaStateSnooze)
             {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.PrefixLabel("Status");
@@ -220,7 +239,7 @@ namespace HeathenEngineering.SteamApi.Editors
 
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.PrefixLabel("Steam Name");
-            EditorGUILayout.LabelField(pManager != null && !string.IsNullOrEmpty(pManager.Settings.UserData.DisplayName) ? pManager.Settings.UserData.DisplayName : "unknown");
+            EditorGUILayout.LabelField(pManager != null && !string.IsNullOrEmpty(pManager.settings.client.userData.DisplayName) ? pManager.settings.client.userData.DisplayName : "unknown");
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
@@ -234,9 +253,9 @@ namespace HeathenEngineering.SteamApi.Editors
 
             EditorGUILayout.Space();
 
-            if (pManager.Settings.UserData.Avatar != null)
+            if (pManager.settings.client.userData.avatar != null)
             {
-                EditorGUI.DrawPreviewTexture(iRect, pManager.Settings.UserData.Avatar);
+                EditorGUI.DrawPreviewTexture(iRect, pManager.settings.client.userData.avatar);
             }
             else
             {
@@ -248,13 +267,13 @@ namespace HeathenEngineering.SteamApi.Editors
         {
             EditorGUILayout.PropertyField(DoNotDestroyOnLoad);
             EditorGUILayout.BeginHorizontal();
-            if (pManager.Settings != null)
+            if (pManager.settings != null)
             {
-                var v = System.Convert.ToUInt32(EditorGUILayout.IntField("Steam App Id", System.Convert.ToInt32(pManager.Settings.ApplicationId.m_AppId)));
-                if (v != pManager.Settings.ApplicationId.m_AppId)
+                var v = System.Convert.ToUInt32(EditorGUILayout.IntField("Steam App Id", System.Convert.ToInt32(pManager.settings.applicationId.m_AppId)));
+                if (v != pManager.settings.applicationId.m_AppId)
                 {
-                    pManager.Settings.ApplicationId.m_AppId = v;
-                    EditorUtility.SetDirty(pManager.Settings);
+                    pManager.settings.applicationId.m_AppId = v;
+                    EditorUtility.SetDirty(pManager.settings);
                 }
             }
             EditorGUILayout.EndHorizontal();
@@ -262,29 +281,29 @@ namespace HeathenEngineering.SteamApi.Editors
             EditorGUILayout.Space();
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.PrefixLabel("Notification Settings");
-            if (pManager.Settings == null)
+            if (pManager.settings == null)
             {
                 EditorGUILayout.LabelField("Requires Steam Settings");
             }
             else
             {
-                int cSelected = (int)pManager.Settings.NotificationPosition;
+                int cSelected = (int)pManager.settings.client.overlay.notificationPosition;
 
                 EditorGUILayout.BeginVertical();
                 cSelected = EditorGUILayout.Popup(cSelected, new string[] { "Top Left", "Top Right", "Bottom Left", "Bottom Right" });
 
-                var v = EditorGUILayout.Vector2IntField(GUIContent.none, pManager.Settings.NotificationInset);
-                if (pManager.Settings.NotificationInset != v)
+                var v = EditorGUILayout.Vector2IntField(GUIContent.none, pManager.settings.client.overlay.notificationInset);
+                if (pManager.settings.client.overlay.notificationInset != v)
                 {
-                    pManager.Settings.NotificationInset = v;
-                    EditorUtility.SetDirty(pManager.Settings);
+                    pManager.settings.client.overlay.notificationInset = v;
+                    EditorUtility.SetDirty(pManager.settings);
                 }
                 EditorGUILayout.EndVertical();
 
-                if (pManager.Settings.NotificationPosition != (ENotificationPosition)cSelected)
+                if (pManager.settings.client.overlay.notificationPosition != (ENotificationPosition)cSelected)
                 {
-                    pManager.Settings.NotificationPosition = (ENotificationPosition)cSelected;
-                    EditorUtility.SetDirty(pManager.Settings);
+                    pManager.settings.client.overlay.notificationPosition = (ENotificationPosition)cSelected;
+                    EditorUtility.SetDirty(pManager.settings);
                 }
             }
             EditorGUILayout.EndHorizontal();
@@ -298,8 +317,13 @@ namespace HeathenEngineering.SteamApi.Editors
 
             int il = EditorGUI.indentLevel;
             EditorGUI.indentLevel++;
-            for (int i = 0; i < pManager.Settings.stats.Count; i++)
+
+            for (int i = 0; i < pManager.settings.client.stats.Count; i++)
             {
+                var target = pManager.settings.client.stats[i];
+                if (target == null)
+                    continue;
+
                 Color sC = GUI.backgroundColor;
 
                 GUI.backgroundColor = sC;
@@ -307,27 +331,31 @@ namespace HeathenEngineering.SteamApi.Editors
                 if (GUILayout.Button(statIcon, EditorStyles.toolbarButton, GUILayout.Width(20)))
                 {
                     GUI.FocusControl(null);
-                    EditorGUIUtility.PingObject(pManager.Settings.stats[i]);
-                    Selection.activeObject = pManager.Settings.stats[i];
+                    EditorGUIUtility.PingObject(target);
+                    Selection.activeObject = target;
                 }
-                if (GUILayout.Button(pManager.Settings.stats[i].name.Replace(" Float Stat Data", "").Replace(" Int Stat Data", "").Replace("Float Stat Data ", "").Replace("Int Stat Data ", "") + " ID", EditorStyles.toolbarButton))
+                if (GUILayout.Button(target.name.Replace(" Float Stat Data", "").Replace(" Int Stat Data", "").Replace("Float Stat Data ", "").Replace("Int Stat Data ", "") + " ID", EditorStyles.toolbarButton))
                 {
                     GUI.FocusControl(null);
-                    EditorGUIUtility.PingObject(pManager.Settings.stats[i]);
+                    EditorGUIUtility.PingObject(target);
                 }
 
-                pManager.Settings.stats[i].statName = EditorGUILayout.TextField(pManager.Settings.stats[i].statName);
+                target.statName = EditorGUILayout.TextField(target.statName);
 
                 var color = GUI.contentColor;
+                var terminate = false;
                 GUI.contentColor = new Color(1, 0.50f, 0.50f, 1);
                 if (GUILayout.Button("X", EditorStyles.toolbarButton, GUILayout.Width(25)))
                 {
                     GUI.FocusControl(null);
-                    pManager.Settings.stats.RemoveAt(i);
-                    return;
+                    pManager.settings.client.stats.RemoveAt(i);
+                    terminate = true;
                 }
                 GUI.contentColor = color;
                 EditorGUILayout.EndHorizontal();
+
+                if (terminate)
+                    break;
             }
             EditorGUI.indentLevel = il;
         }
@@ -340,8 +368,14 @@ namespace HeathenEngineering.SteamApi.Editors
 
             int il = EditorGUI.indentLevel;
             EditorGUI.indentLevel++;
-            for (int i = 0; i < pManager.Settings.achievements.Count; i++)
+
+            for (int i = 0; i < pManager.settings.client.achievements.Count; i++)
             {
+                var target = pManager.settings.client.achievements[i];
+
+                if (target == null)
+                    continue;
+
                 Color sC = GUI.backgroundColor;
 
                 GUI.backgroundColor = sC;
@@ -349,27 +383,31 @@ namespace HeathenEngineering.SteamApi.Editors
                 if (GUILayout.Button(achievementIcon, EditorStyles.toolbarButton, GUILayout.Width(20)))
                 {
                     GUI.FocusControl(null);
-                    EditorGUIUtility.PingObject(pManager.Settings.stats[i]);
-                    Selection.activeObject = pManager.Settings.stats[i];
+                    EditorGUIUtility.PingObject(target);
+                    Selection.activeObject = target;
                 }
-                if (GUILayout.Button(pManager.Settings.achievements[i].name.Replace("Steam Achievement Data ", "") + " ID", EditorStyles.toolbarButton))
+                if (GUILayout.Button(target.name.Replace("Steam Achievement Data ", "") + " ID", EditorStyles.toolbarButton))
                 {
                     GUI.FocusControl(null);
-                    EditorGUIUtility.PingObject(pManager.Settings.achievements[i]);
+                    EditorGUIUtility.PingObject(target);
                 }
 
-                pManager.Settings.achievements[i].achievementId = EditorGUILayout.TextField(pManager.Settings.achievements[i].achievementId);
+                target.achievementId = EditorGUILayout.TextField(target.achievementId);
 
+                var terminate = false;
                 var color = GUI.contentColor;
                 GUI.contentColor = new Color(1, 0.50f, 0.50f, 1);
                 if (GUILayout.Button("X", EditorStyles.toolbarButton, GUILayout.Width(25)))
                 {
                     GUI.FocusControl(null);
-                    pManager.Settings.achievements.RemoveAt(i);
-                    return;
+                    pManager.settings.client.achievements.RemoveAt(i);
+                    terminate = true;
                 }
                 GUI.contentColor = color;
                 EditorGUILayout.EndHorizontal();
+
+                if (terminate)
+                    break;
             }
             EditorGUI.indentLevel = il;
         }
@@ -412,20 +450,20 @@ namespace HeathenEngineering.SteamApi.Editors
                             if (dragged_object.GetType() == typeof(SteamFloatStatData) || dragged_object.GetType() == typeof(SteamIntStatData))
                             {
                                 SteamStatData go = dragged_object as SteamStatData;
-                                if (!pManager.Settings.stats.Exists(p => p == go))
+                                if (!pManager.settings.client.stats.Exists(p => p == go))
                                 {
-                                    pManager.Settings.stats.Add(go);
-                                    EditorUtility.SetDirty(pManager.Settings);
+                                    pManager.settings.client.stats.Add(go);
+                                    EditorUtility.SetDirty(pManager.settings);
                                     result = true;
                                 }
                             }
                             else if (dragged_object.GetType() == typeof(SteamAchievementData))
                             {
                                 SteamAchievementData go = dragged_object as SteamAchievementData;
-                                if (!pManager.Settings.achievements.Exists(p => p == go))
+                                if (!pManager.settings.client.achievements.Exists(p => p == go))
                                 {
-                                    pManager.Settings.achievements.Add(go);
-                                    EditorUtility.SetDirty(pManager.Settings);
+                                    pManager.settings.client.achievements.Add(go);
+                                    EditorUtility.SetDirty(pManager.settings);
                                     result = true;
                                 }
                             }

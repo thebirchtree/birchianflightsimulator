@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 026d6f43a48f9924eb3e47d6098bcd4c, type: 3}
   m_Name: Coin
   m_EditorClassIdentifier: 
-  prefab: {fileID: 1104612172148754, guid: f7cc9c19000f5454b857bda3e05168f3, type: 3}
+  prefab: {fileID: 2269371702811840620, guid: 13a466a6bd9cdd24eb9fb49612e02623, type: 3}
   type: 0
   description: Coin
   coinValue: 1

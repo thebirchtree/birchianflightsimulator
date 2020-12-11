@@ -7,24 +7,31 @@ using HeathenEngineering.SteamApi.Foundation;
 using Steamworks;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace HeathenEngineering.SteamApi.Networking
 {
     public class SteamLobbyDisplayList : MonoBehaviour
     {
-        public SteamworksLobbySettings LobbySettings;
-        public LobbyHunterFilter Filter;
+        public SteamSettings steamSettings;
+        [FormerlySerializedAs("LobbySettings")]
+        public SteamworksLobbySettings lobbySettings;
+        [FormerlySerializedAs("Filter")]
+        public LobbyHunterFilter filter;
         public LobbyRecordBehvaiour recordPrototype;
         public Transform collection;
-        public UnityEvent OnSearchStarted;
-        public UnityEvent OnSearchCompleted;
-        public UnitySteamIdEvent OnLobbySelected;
+        [FormerlySerializedAs("OnSearchStarted")]
+        public UnityEvent onSearchStarted;
+        [FormerlySerializedAs("OnSearchCompleted")]
+        public UnityEvent onSearchCompleted;
+        [FormerlySerializedAs("OnLobbySelected")]
+        public UnitySteamIdEvent onLobbySelected;
 
         private void OnEnable()
         {
-            if (LobbySettings != null && LobbySettings.Manager != null)
+            if (lobbySettings != null && lobbySettings.Manager != null)
             {
-                LobbySettings.OnLobbyMatchList.AddListener(HandleBrowseLobbies);
+                lobbySettings.OnLobbyMatchList.AddListener(HandleBrowseLobbies);
             }
             else
             {
@@ -35,9 +42,9 @@ namespace HeathenEngineering.SteamApi.Networking
 
         private void OnDisable()
         {
-            if (LobbySettings != null && LobbySettings.Manager != null)
+            if (lobbySettings != null && lobbySettings.Manager != null)
             {
-                LobbySettings.OnLobbyMatchList.RemoveListener(HandleBrowseLobbies);
+                lobbySettings.OnLobbyMatchList.RemoveListener(HandleBrowseLobbies);
             }
         }
 
@@ -47,34 +54,34 @@ namespace HeathenEngineering.SteamApi.Networking
             {
                 var go = Instantiate(recordPrototype.gameObject, collection);
                 var rec = go.GetComponent<LobbyRecordBehvaiour>();
-                rec.SetLobby(l, LobbySettings);
+                rec.SetLobby(l, lobbySettings);
                 rec.OnSelected.AddListener(HandleOnSelected);
             }
-            OnSearchCompleted.Invoke();
+            onSearchCompleted.Invoke();
         }
 
         private void HandleOnSelected(CSteamID lobbyId)
         {
             //Pass the event on
-            OnLobbySelected.Invoke(lobbyId);
+            onLobbySelected.Invoke(lobbyId);
         }
 
         public void QuickMatch()
         {
-            OnSearchStarted.Invoke();
-            LobbySettings.Manager.QuickMatch(Filter, SteamworksFoundationManager.Instance.Settings.UserData.DisplayName, true);
+            onSearchStarted.Invoke();
+            lobbySettings.Manager.QuickMatch(filter, steamSettings.client.userData.DisplayName, true);
         }
 
         public void QuickMatch(string onCreateName)
         {
-            OnSearchStarted.Invoke();
-            LobbySettings.Manager.QuickMatch(Filter, onCreateName, true);
+            onSearchStarted.Invoke();
+            lobbySettings.Manager.QuickMatch(filter, onCreateName, true);
         }
 
         public void BrowseLobbies()
         {
-            OnSearchStarted.Invoke();
-            LobbySettings.Manager.FindMatch(Filter);
+            onSearchStarted.Invoke();
+            lobbySettings.Manager.FindMatch(filter);
         }
 
         public void ClearLobbies()

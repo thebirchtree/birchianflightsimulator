@@ -67,14 +67,14 @@ namespace HeathenEngineering.SteamApi.Networking.Demo
         private void RpcUpdateSteamUserData(ulong SteamId)
         {
             //The server recieved the Steam ID
-            SteamUser = steamSettings.GetUserData(new CSteamID(SteamId));
+            SteamUser = steamSettings.client.GetUserData(new CSteamID(SteamId));
             //This is the Steam User's name as it appears in Steam social contexts
             UserName = SteamUser.DisplayName;
             //This is the Steam User's avatar e.g. the profile image
-            Avatar = SteamUser.Avatar;
-            rawImage.texture = SteamUser.Avatar;
+            Avatar = SteamUser.avatar;
+            rawImage.texture = SteamUser.avatar;
             //And this is the Steam User's ID e.g the number which represents the profile
-            this.SteamId = SteamUser.SteamId.m_SteamID;
+            this.SteamId = SteamUser.id.m_SteamID;
         }
     }
 }

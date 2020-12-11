@@ -14,14 +14,21 @@ namespace UnityStandardAssets.Utility
 		// the height we want the camera to be above the target
 		[SerializeField]
 		private float height = 5.0f;
-
 		[SerializeField]
 		private float rotationDamping;
 		[SerializeField]
 		private float heightDamping;
+        [SerializeField]
+        private float yOffset;
 
-		// Use this for initialization
-		void Start() { }
+        public void Init(Transform camTarget)
+        {
+            transform.position = new Vector3(camTarget.position.x, camTarget.position.y + height, camTarget.position.z);
+            transform.position -= camTarget.rotation * Vector3.forward * distance;
+            transform.rotation = camTarget.rotation;
+
+            target = camTarget;
+        }
 
 		// Update is called once per frame
 		void LateUpdate()
@@ -55,7 +62,7 @@ namespace UnityStandardAssets.Utility
 			transform.position = new Vector3(transform.position.x ,currentHeight , transform.position.z);
 
 			// Always look at the target
-			transform.LookAt(target);
+			transform.LookAt(new Vector3(target.position.x, target.position.y + yOffset, target.position.z));
 		}
 	}
 }

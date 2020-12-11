@@ -6,6 +6,7 @@
 using UnityEngine;
 using HeathenEngineering.Tools;
 using HeathenEngineering.Scriptable;
+using UnityEngine.Serialization;
 
 namespace HeathenEngineering.SteamApi.Foundation.UI
 {
@@ -14,102 +15,122 @@ namespace HeathenEngineering.SteamApi.Foundation.UI
     /// </summary>
     public class SteamUserFullIcon : HeathenUIBehaviour
     {
+        [FormerlySerializedAs("SteamSettings")]
+        public SteamSettings steamSettings;
         /// <summary>
         /// The <see cref="HeathenEngineering.SteamApi.Foundation.SteamUserData"/> to load.
         /// This should be set by calling <see cref="HeathenEngineering.SteamApi.Foundation.UI.SteamUserFullIcon.LinkSteamUser(SteamUserData)"/>
         /// </summary>
-        public SteamUserData UserData;
+        [FormerlySerializedAs("UserData")]
+        public SteamUserData userData;
         /// <summary>
         /// Should the status label be shown or not
         /// </summary>
-        public BoolReference ShowStatusLabel;
+        [FormerlySerializedAs("ShowStatusLabel")]
+        public BoolReference showStatusLabel;
 
         /// <summary>
         /// The image to load the avatar into.
         /// </summary>
         [Header("References")]
-        public UnityEngine.UI.RawImage Avatar;
+        [FormerlySerializedAs("Avatar")]
+        public UnityEngine.UI.RawImage avatar;
         /// <summary>
         /// The text field used to display the users name
         /// </summary>
-        public UnityEngine.UI.Text PersonaName;
+        [FormerlySerializedAs("PersonaName")]
+        public UnityEngine.UI.Text personaName;
         /// <summary>
         /// The text field used to display the users status
         /// </summary>
-        public UnityEngine.UI.Text StatusLabel;
+        [FormerlySerializedAs("StatusLabel")]
+        public UnityEngine.UI.Text statusLabel;
         /// <summary>
         /// An image board around the icon ... this will have its color changed based on status
         /// </summary>
-        public UnityEngine.UI.Image IconBorder;
+        [FormerlySerializedAs("IconBorder")]
+        public UnityEngine.UI.Image iconBorder;
         /// <summary>
         /// The root object containing the status label parts ... this is what is enabled or disabled as the label is shown or hidden.
         /// </summary>
-        public GameObject StatusLabelContainer;
+        [FormerlySerializedAs("StatusLabelContainer")]
+        public GameObject statusLabelContainer;
         /// <summary>
         /// Should the persona name be colored based on status
         /// </summary>
-        public bool ColorThePersonaName = true;
+        [FormerlySerializedAs("ColorThePersonaName")]
+        public bool colorThePersonaName = true;
         /// <summary>
         /// Should the status label be colored based on status
         /// </summary>
-        public bool ColorTheStatusLabel = true;
+        [FormerlySerializedAs("ColorTheStatusLabel")]
+        public bool colorTheStatusLabel = true;
         /// <summary>
         /// <para></para>
         /// <para>You can use <see cref="HeathenEngineering.Scriptable.ColorVariable"/> to configure these with an asset or set them in editor.</para>
         /// </summary>
         [Header("Border Colors")]
-        public ColorReference OfflineColor;
+        [FormerlySerializedAs("OfflineColor")]
+        public ColorReference offlineColor;
         /// <summary>
         /// <para>The color to use for Online</para>
         /// <para>You can use <see cref="HeathenEngineering.Scriptable.ColorVariable"/> to configure these with an asset or set them in editor.</para>
         /// </summary>
-        public ColorReference OnlineColor;
+        [FormerlySerializedAs("OnlineColor")]
+        public ColorReference onlineColor;
         /// <summary>
         /// <para>The color to use for Away</para>
         /// <para>You can use <see cref="HeathenEngineering.Scriptable.ColorVariable"/> to configure these with an asset or set them in editor.</para>
         /// </summary>
-        public ColorReference AwayColor;
+        [FormerlySerializedAs("AwayColor")]
+        public ColorReference awayColor;
         /// <summary>
         /// <para>The color to use for Buisy</para>
         /// <para>You can use <see cref="HeathenEngineering.Scriptable.ColorVariable"/> to configure these with an asset or set them in editor.</para>
         /// </summary>
-        public ColorReference BuisyColor;
+        [FormerlySerializedAs("BuisyColor")]
+        public ColorReference buisyColor;
         /// <summary>
         /// <para>The color to use for Snooze</para>
         /// <para>You can use <see cref="HeathenEngineering.Scriptable.ColorVariable"/> to configure these with an asset or set them in editor.</para>
         /// </summary>
-        public ColorReference SnoozeColor;
+        [FormerlySerializedAs("SnoozeColor")]
+        public ColorReference snoozeColor;
         /// <summary>
         /// <para>The color to use for the Want to Play status</para>
         /// <para>You can use <see cref="HeathenEngineering.Scriptable.ColorVariable"/> to configure these with an asset or set them in editor.</para>
         /// </summary>
-        public ColorReference WantPlayColor;
+        [FormerlySerializedAs("WantPlayColor")]
+        public ColorReference wantPlayColor;
         /// <summary>
         /// <para>The color to use for the Want to Trade status</para>
         /// <para>You can use <see cref="HeathenEngineering.Scriptable.ColorVariable"/> to configure these with an asset or set them in editor.</para>
         /// </summary>
-        public ColorReference WantTradeColor;
+        [FormerlySerializedAs("WantTradeColor")]
+        public ColorReference wantTradeColor;
         /// <summary>
         /// <para>Color to use for In Game satus</para>
         /// <para>You can use <see cref="HeathenEngineering.Scriptable.ColorVariable"/> to configure these with an asset or set them in editor.</para>
         /// </summary>
-        public ColorReference InGameColor;
+        [FormerlySerializedAs("InGameColor")]
+        public ColorReference inGameColor;
         /// <summary>
         /// <para>The color to use when in this specific game</para>
         /// <para>You can use <see cref="HeathenEngineering.Scriptable.ColorVariable"/> to configure these with an asset or set them in editor.</para>
         /// </summary>
-        public ColorReference ThisGameColor;
+        [FormerlySerializedAs("ThisGameColor")]
+        public ColorReference thisGameColor;
 
         private void Start()
         {
-            if (UserData != null)
-                LinkSteamUser(UserData);
+            if (userData != null)
+                LinkSteamUser(userData);
         }
 
         private void Update()
         {
-            if (ShowStatusLabel.Value != StatusLabelContainer.activeSelf)
-                StatusLabelContainer.SetActive(ShowStatusLabel.Value);
+            if (showStatusLabel.Value != statusLabelContainer.activeSelf)
+                statusLabelContainer.SetActive(showStatusLabel.Value);
         }
 
         /// <summary>
@@ -128,161 +149,161 @@ namespace HeathenEngineering.SteamApi.Foundation.UI
         /// </example>
         public void LinkSteamUser(SteamUserData newUserData)
         {
-            if (UserData != null)
+            if (userData != null)
             {
-                if (UserData.OnAvatarChanged != null)
-                    UserData.OnAvatarChanged.RemoveListener(handleAvatarChange);
-                if (UserData.OnStateChange != null)
-                    UserData.OnStateChange.RemoveListener(handleStateChange);
-                if (UserData.OnNameChanged != null)
-                    UserData.OnNameChanged.RemoveListener(handleNameChanged);
-                if (UserData.OnAvatarLoaded != null)
-                    UserData.OnAvatarLoaded.RemoveListener(handleAvatarChange);
+                if (userData.OnAvatarChanged != null)
+                    userData.OnAvatarChanged.RemoveListener(handleAvatarChange);
+                if (userData.OnStateChange != null)
+                    userData.OnStateChange.RemoveListener(handleStateChange);
+                if (userData.OnNameChanged != null)
+                    userData.OnNameChanged.RemoveListener(handleNameChanged);
+                if (userData.OnAvatarLoaded != null)
+                    userData.OnAvatarLoaded.RemoveListener(handleAvatarChange);
             }
 
-            UserData = newUserData;
+            userData = newUserData;
             handleAvatarChange();
             handleNameChanged();
             handleStateChange();
 
-            if (UserData != null)
+            if (userData != null)
             {
-                if (!UserData.IconLoaded)
-                    SteamworksFoundationManager.Instance.Settings.RefreshAvatar(UserData);
+                if (!userData.iconLoaded)
+                    steamSettings.client.RefreshAvatar(userData);
 
-                Avatar.texture = UserData.Avatar;
-                if (UserData.OnAvatarChanged == null)
-                    UserData.OnAvatarChanged = new UnityEngine.Events.UnityEvent();
-                UserData.OnAvatarChanged.AddListener(handleAvatarChange);
-                if (UserData.OnStateChange == null)
-                    UserData.OnStateChange = new UnityEngine.Events.UnityEvent();
-                UserData.OnStateChange.AddListener(handleStateChange);
-                if (UserData.OnNameChanged == null)
-                    UserData.OnNameChanged = new UnityEngine.Events.UnityEvent();
-                UserData.OnNameChanged.AddListener(handleNameChanged);
-                if (UserData.OnAvatarLoaded == null)
-                    UserData.OnAvatarLoaded = new UnityEngine.Events.UnityEvent();
-                UserData.OnAvatarLoaded.AddListener(handleAvatarChange);
+                avatar.texture = userData.avatar;
+                if (userData.OnAvatarChanged == null)
+                    userData.OnAvatarChanged = new UnityEngine.Events.UnityEvent();
+                userData.OnAvatarChanged.AddListener(handleAvatarChange);
+                if (userData.OnStateChange == null)
+                    userData.OnStateChange = new UnityEngine.Events.UnityEvent();
+                userData.OnStateChange.AddListener(handleStateChange);
+                if (userData.OnNameChanged == null)
+                    userData.OnNameChanged = new UnityEngine.Events.UnityEvent();
+                userData.OnNameChanged.AddListener(handleNameChanged);
+                if (userData.OnAvatarLoaded == null)
+                    userData.OnAvatarLoaded = new UnityEngine.Events.UnityEvent();
+                userData.OnAvatarLoaded.AddListener(handleAvatarChange);
             }
         }
 
         private void handleNameChanged()
         {
-            PersonaName.text = UserData.DisplayName;
+            personaName.text = userData.DisplayName;
         }
 
         private void handleAvatarChange()
         {
-            Avatar.texture = UserData.Avatar;
+            avatar.texture = userData.avatar;
         }
 
         private void handleStateChange()
         {
-            switch(UserData.State)
+            switch(userData.State)
             {
                 case Steamworks.EPersonaState.k_EPersonaStateAway:
-                    if (UserData.InGame)
+                    if (userData.InGame)
                     {
-                        if (UserData.GameInfo.m_gameID.AppID().m_AppId == SteamworksFoundationManager.Instance.Settings.ApplicationId.m_AppId)
+                        if (userData.GameInfo.m_gameID.AppID().m_AppId == steamSettings.applicationId.m_AppId)
                         {
-                            StatusLabel.text = "Playing";
-                            IconBorder.color = ThisGameColor.Value;
+                            statusLabel.text = "Playing";
+                            iconBorder.color = thisGameColor.Value;
                         }
                         else
                         {
-                            StatusLabel.text = "In-Game";
-                            IconBorder.color = InGameColor.Value;
+                            statusLabel.text = "In-Game";
+                            iconBorder.color = inGameColor.Value;
                         }
                     }
                     else
                     {
-                        StatusLabel.text = "Away";
-                        IconBorder.color = AwayColor.Value;
+                        statusLabel.text = "Away";
+                        iconBorder.color = awayColor.Value;
                     }
                     break;
                 case Steamworks.EPersonaState.k_EPersonaStateBusy:
-                    if (UserData.InGame)
+                    if (userData.InGame)
                     {
-                        if (UserData.GameInfo.m_gameID.AppID().m_AppId == SteamworksFoundationManager.Instance.Settings.ApplicationId.m_AppId)
+                        if (userData.GameInfo.m_gameID.AppID().m_AppId == steamSettings.applicationId.m_AppId)
                         {
-                            StatusLabel.text = "Playing";
-                            IconBorder.color = ThisGameColor.Value;
+                            statusLabel.text = "Playing";
+                            iconBorder.color = thisGameColor.Value;
                         }
                         else
                         {
-                            StatusLabel.text = "In-Game";
-                            IconBorder.color = InGameColor.Value;
+                            statusLabel.text = "In-Game";
+                            iconBorder.color = inGameColor.Value;
                         }
                     }
                     else
                     {
-                        StatusLabel.text = "Buisy";
-                        IconBorder.color = BuisyColor.Value;
+                        statusLabel.text = "Buisy";
+                        iconBorder.color = buisyColor.Value;
                     }
                     break;
                 case Steamworks.EPersonaState.k_EPersonaStateLookingToPlay:
-                    StatusLabel.text = "Looking to Play";
-                    IconBorder.color = WantPlayColor.Value;
+                    statusLabel.text = "Looking to Play";
+                    iconBorder.color = wantPlayColor.Value;
                     break;
                 case Steamworks.EPersonaState.k_EPersonaStateLookingToTrade:
-                    StatusLabel.text = "Looking to Trade";
-                    IconBorder.color = WantTradeColor.Value;
+                    statusLabel.text = "Looking to Trade";
+                    iconBorder.color = wantTradeColor.Value;
                     break;
                 case Steamworks.EPersonaState.k_EPersonaStateOffline:
-                    StatusLabel.text = "Offline";
-                    IconBorder.color = OfflineColor.Value;
+                    statusLabel.text = "Offline";
+                    iconBorder.color = offlineColor.Value;
                     break;
                 case Steamworks.EPersonaState.k_EPersonaStateOnline:
-                    if (UserData.InGame)
+                    if (userData.InGame)
                     {
-                        if (UserData.GameInfo.m_gameID.AppID().m_AppId == SteamworksFoundationManager.Instance.Settings.ApplicationId.m_AppId)
+                        if (userData.GameInfo.m_gameID.AppID().m_AppId == steamSettings.applicationId.m_AppId)
                         {
-                            StatusLabel.text = "Playing";
-                            IconBorder.color = ThisGameColor.Value;
+                            statusLabel.text = "Playing";
+                            iconBorder.color = thisGameColor.Value;
                         }
                         else
                         {
-                            StatusLabel.text = "In-Game";
-                            IconBorder.color = InGameColor.Value;
+                            statusLabel.text = "In-Game";
+                            iconBorder.color = inGameColor.Value;
                         }
                     }
                     else
                     {
-                        StatusLabel.text = "Online";
-                        IconBorder.color = OnlineColor.Value;
+                        statusLabel.text = "Online";
+                        iconBorder.color = onlineColor.Value;
                     }
                     break;
                 case Steamworks.EPersonaState.k_EPersonaStateSnooze:
-                    if (UserData.InGame)
+                    if (userData.InGame)
                     {
-                        if (UserData.GameInfo.m_gameID.AppID().m_AppId == SteamworksFoundationManager.Instance.Settings.ApplicationId.m_AppId)
+                        if (userData.GameInfo.m_gameID.AppID().m_AppId == steamSettings.applicationId.m_AppId)
                         {
-                            StatusLabel.text = "Playing";
-                            IconBorder.color = ThisGameColor.Value;
+                            statusLabel.text = "Playing";
+                            iconBorder.color = thisGameColor.Value;
                         }
                         else
                         {
-                            StatusLabel.text = "In-Game";
-                            IconBorder.color = InGameColor.Value;
+                            statusLabel.text = "In-Game";
+                            iconBorder.color = inGameColor.Value;
                         }
                     }
                     else
                     {
-                        StatusLabel.text = "Snooze";
-                        IconBorder.color = SnoozeColor.Value;
+                        statusLabel.text = "Snooze";
+                        iconBorder.color = snoozeColor.Value;
                     }
                     break;
             }
-            if (ColorTheStatusLabel)
-                StatusLabel.color = IconBorder.color;
-            if (ColorThePersonaName)
-                PersonaName.color = IconBorder.color;
+            if (colorTheStatusLabel)
+                statusLabel.color = iconBorder.color;
+            if (colorThePersonaName)
+                personaName.color = iconBorder.color;
         }
 
         private void OnDestroy()
         {
-            if (UserData != null)
-                UserData.OnAvatarChanged.RemoveListener(handleAvatarChange);
+            if (userData != null)
+                userData.OnAvatarChanged.RemoveListener(handleAvatarChange);
         }
     }
 }

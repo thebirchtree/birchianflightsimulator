@@ -9,16 +9,16 @@ EditorBuildSettings:
     path: Assets/Assets/ASSET/Scenes/Menu.unity
     guid: d516d9a8a56cc4c6ab84b7732ccff46d
   - enabled: 1
-    path: Assets/LevelFinder.unity
+    path: Assets/Scenes/LevelFinder.unity
     guid: 8441feae96e634a0ebf02fadb3b21dbe
   - enabled: 1
-    path: Assets/LevelFinderOld.unity
+    path: Assets/Scenes/LevelFinderOld.unity
     guid: 22a0b19f89a9c423181540da22bafad2
   - enabled: 1
     path: Assets/Scenes/Scene Air.unity
     guid: 2a55255be48384aae8d70a57dd7a3008
   - enabled: 1
-    path: Assets/Island.unity
+    path: Assets/Scenes/Island.unity
     guid: 4b9a8a16f26f04ba7a20a383df5388be
   - enabled: 1
     path: Assets/Scenes/Mars.unity
@@ -48,10 +48,10 @@ EditorBuildSettings:
     path: Assets/Assets/ASSET/IAP2.unity
     guid: 9f38a7f3ec07a444d9018e75a9236af2
   - enabled: 1
-    path: Assets/tut.unity
+    path: Assets/Scenes/tut.unity
     guid: e208c0f15ee12f34cbd79e370b7bd3e2
   - enabled: 1
-    path: Assets/MULTI.unity
+    path: Assets/Scenes/MULTI.unity
     guid: 95ce4a30b9b4f7c4cb3ea6a52717c948
   - enabled: 1
     path: Assets/Assets/ASSET/LAN.unity
@@ -69,10 +69,10 @@ EditorBuildSettings:
     path: Assets/Scenes/RebM2.unity
     guid: cfb37a2e61b76724e918c705895865dc
   - enabled: 0
-    path: Assets/MenuN.unity
+    path: Assets/Scenes/MenuN.unity
     guid: 65cca8edc10f34a4a8fba850278967f3
   - enabled: 0
-    path: Assets/X.unity
+    path: Assets/Scenes/X.unity
     guid: 214b8980aa67ee44595c7d85ab39facf
   - enabled: 0
     path: Assets/Scenes/Space2.unity

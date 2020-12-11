@@ -53,7 +53,7 @@ namespace HeathenEngineering.SteamApi.Networking.Demo
         private void Update()
         {
             if (record.lobbyId != CSteamID.Nil
-                && LobbySettings.lobbyId.m_SteamID == record.lobbyId.m_SteamID)
+                && LobbySettings.lobbies[0].id.m_SteamID == record.lobbyId.m_SteamID)
             {
                 connectButton.interactable = false;
                 buttonLabel.text = "You are here!";

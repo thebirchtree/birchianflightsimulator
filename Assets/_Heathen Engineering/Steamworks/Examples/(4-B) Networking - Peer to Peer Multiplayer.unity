@@ -166,8 +166,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11d16c72954c5f94490e1d3c31a89d00, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LobbySettings: {fileID: 11400000, guid: aadb3480c593d36468d3cd0a0d427b77, type: 2}
-  QuickMatchFilter:
+  steamSettings: {fileID: 11400000, guid: e56f48543a769984c897a8b4ee49b69e, type: 2}
+  lobbySettings: {fileID: 11400000, guid: aadb3480c593d36468d3cd0a0d427b77, type: 2}
+  quickMatchFilter:
     maxResults: 10
     useDistanceFilter: 1
     distanceOption: 3
@@ -694,12 +695,12 @@ PrefabInstance:
     - target: {fileID: 224299602010953466, guid: 6b4f290bbe49a7b4fad7c91f76975bf7,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -0.00004630077
+      value: -0.000030517578
       objectReference: {fileID: 0}
     - target: {fileID: 224299602010953466, guid: 6b4f290bbe49a7b4fad7c91f76975bf7,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.000017538307
+      value: -0.00001024053
       objectReference: {fileID: 0}
     - target: {fileID: 224500540785964124, guid: 6b4f290bbe49a7b4fad7c91f76975bf7,
         type: 3}
@@ -1109,22 +1110,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e199e0052473a9d40b85f57bdc651a0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Settings: {fileID: 11400000, guid: e56f48543a769984c897a8b4ee49b69e, type: 2}
+  settings: {fileID: 11400000, guid: e56f48543a769984c897a8b4ee49b69e, type: 2}
   _doNotDistroyOnLoad:
     Mode: 0
     m_constantValue: 0
     Variable: {fileID: 0}
-  _Initialized:
-    Mode: 0
-    m_constantValue: 0
-    Variable: {fileID: 0}
-  OnSteamInitalized:
+  onSteamInitalized:
     m_PersistentCalls:
       m_Calls: []
-  OnSteamInitalizationError:
+  onSteamInitalizationError:
     m_PersistentCalls:
       m_Calls: []
-  OnOverlayActivated:
+  onOverlayActivated:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1516153684}
@@ -1138,7 +1135,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  OnUserStatsRecieved:
+  onUserStatsRecieved:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
@@ -1152,7 +1149,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  OnUserStatsStored:
+  onUserStatsStored:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
@@ -1166,21 +1163,34 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  OnNumberOfCurrentPlayersResult:
+  onNumberOfCurrentPlayersResult:
     m_PersistentCalls:
       m_Calls: []
-  OnAchievementStored:
+  onAchievementStored:
     m_PersistentCalls:
       m_Calls: []
-  OnAvatarLoaded:
+  onAvatarLoaded:
     m_PersistentCalls:
       m_Calls: []
-  OnPersonaStateChanged:
+  onPersonaStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  OnRecievedFriendChatMessage:
+  onRecievedFriendChatMessage:
     m_PersistentCalls:
       m_Calls: []
+  gameServerShuttingDown:
+    m_PersistentCalls:
+      m_Calls: []
+  disconnected:
+    m_PersistentCalls:
+      m_Calls: []
+  connected:
+    m_PersistentCalls:
+      m_Calls: []
+  failure:
+    m_PersistentCalls:
+      m_Calls: []
+  networkManager: {fileID: 0}
 --- !u!4 &253577535
 Transform:
   m_ObjectHideFlags: 0
@@ -1208,12 +1218,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   LobbySettings: {fileID: 11400000, guid: aadb3480c593d36468d3cd0a0d427b77, type: 2}
-  LobbyDataUpdateFailed:
-    m_PersistentCalls:
-      m_Calls: []
-  OnKickedFromLobby:
-    m_PersistentCalls:
-      m_Calls: []
   OnGameLobbyJoinRequest:
     m_PersistentCalls:
       m_Calls: []
@@ -1223,27 +1227,34 @@ MonoBehaviour:
   OnLobbyCreated:
     m_PersistentCalls:
       m_Calls: []
-  OnOwnershipChange:
-    m_PersistentCalls:
-      m_Calls: []
-  OnMemberJoined:
-    m_PersistentCalls:
-      m_Calls: []
-  OnMemberLeft:
-    m_PersistentCalls:
-      m_Calls: []
-  OnMemberDataChanged:
-    m_PersistentCalls:
-      m_Calls: []
   OnLobbyEnter:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 73766848}
+        m_MethodName: OnEnterLobby
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   OnLobbyExit:
     m_PersistentCalls:
-      m_Calls: []
-  OnLobbyDataChanged:
-    m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 73766848}
+        m_MethodName: OnExitLobby
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   OnGameServerSet:
     m_PersistentCalls:
       m_Calls:
@@ -1263,7 +1274,18 @@ MonoBehaviour:
       m_Calls: []
   QuickMatchFailed:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 73766848}
+        m_MethodName: CreateMatch
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   SearchStarted:
     m_PersistentCalls:
       m_Calls: []
@@ -1299,7 +1321,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dontDestroyOnLoad: 0
   runInBackground: 1
-  startOnHeadless: 0
+  autoStartServerBuild: 0
   showDebugMessages: 0
   serverTickRate: 30
   offlineScene: 
@@ -1307,6 +1329,8 @@ MonoBehaviour:
   transport: {fileID: 253577538}
   networkAddress: localhost
   maxConnections: 4
+  disconnectInactiveConnections: 0
+  disconnectInactiveTimeout: 60
   authenticator: {fileID: 0}
   playerPrefab: {fileID: 1615526213725670, guid: 801ca2bfa2c54234aadd01e8bca137ce,
     type: 3}
@@ -1428,8 +1452,10 @@ MonoBehaviour:
   OnServerDisconnected:
     m_PersistentCalls:
       m_Calls: []
-  messageUpdateRate: 0.03333
-  channels: 0200000000000000
+  Channels: 02000000
+  Timeout: 25
+  AllowSteamRelay: 1
+  SteamUserID: 0
 --- !u!1 &294121585
 GameObject:
   m_ObjectHideFlags: 0
@@ -1698,7 +1724,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.0000123978825}
+  m_AnchoredPosition: {x: -0.000015258789, y: -0.0000123978825}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &423417646
@@ -1738,50 +1764,6 @@ MonoBehaviour:
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
   m_ChildControlHeight: 1
---- !u!1 &443256558
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 443256560}
-  - component: {fileID: 443256559}
-  m_Layer: 0
-  m_Name: Test Object
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!114 &443256559
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 443256558}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c064d0d2038858e47bd6c3a9b64a47bd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Id: 76561197995794890
---- !u!4 &443256560
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 443256558}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 468.582, y: 261.09558, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 5
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &478738196
 GameObject:
   m_ObjectHideFlags: 0
@@ -2007,7 +1989,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 2132258170}
   m_Direction: 0
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.99999994
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -2461,8 +2443,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 869fed70f5874ac4389a8717d2085faf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LobbySettings: {fileID: 11400000, guid: aadb3480c593d36468d3cd0a0d427b77, type: 2}
-  Filter:
+  steamSettings: {fileID: 0}
+  lobbySettings: {fileID: 11400000, guid: aadb3480c593d36468d3cd0a0d427b77, type: 2}
+  filter:
     maxResults: 100
     useDistanceFilter: 0
     distanceOption: 3
@@ -2477,13 +2460,13 @@ MonoBehaviour:
   recordPrototype: {fileID: 114050864524754878, guid: 3a1c6d986d8aac74284ce147510154ae,
     type: 3}
   collection: {fileID: 563564086}
-  OnSearchStarted:
+  onSearchStarted:
     m_PersistentCalls:
       m_Calls: []
-  OnSearchCompleted:
+  onSearchCompleted:
     m_PersistentCalls:
       m_Calls: []
-  OnLobbySelected:
+  onLobbySelected:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 11400000, guid: aadb3480c593d36468d3cd0a0d427b77, type: 2}
@@ -4099,6 +4082,18 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: 1815039a2b5ac1843b9aa1a7712dfbdc,
         type: 2}
+    - target: {fileID: 114090220194972458, guid: 199a4dac58b84ba42bff36758f23d2ba,
+        type: 3}
+      propertyPath: steamSettings
+      value: 
+      objectReference: {fileID: 11400000, guid: e56f48543a769984c897a8b4ee49b69e,
+        type: 2}
+    - target: {fileID: 114090220194972458, guid: 199a4dac58b84ba42bff36758f23d2ba,
+        type: 3}
+      propertyPath: userData
+      value: 
+      objectReference: {fileID: 11400000, guid: 1815039a2b5ac1843b9aa1a7712dfbdc,
+        type: 2}
     - target: {fileID: 224859743571114168, guid: 199a4dac58b84ba42bff36758f23d2ba,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -5623,7 +5618,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1902459097}
   m_Direction: 2
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.99999994
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

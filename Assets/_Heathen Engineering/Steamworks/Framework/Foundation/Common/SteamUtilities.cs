@@ -29,7 +29,7 @@ namespace HeathenEngineering.SteamApi.Foundation
             public static Color ErrorRed = new Color(1, 0.5f, 0.5f, 1);
         }
         #endregion
-
+        
         /// <summary>
         /// <para>Checks if the Overlay needs a present. Only required if using event driven render updates.</para>
         /// <para>Typically this call is unneeded if your game has a constantly running frame loop that calls the D3D Present API, or OGL SwapBuffers API every frame as is the case in most games. However, if you have a game that only refreshes the screen on an event driven basis then that can break the overlay, as it uses your Present/SwapBuffers calls to drive it's internal frame loop and it may also need to Present() to the screen any time a notification happens or when the overlay is brought up over the game by a user. You can use this API to ask the overlay if it currently need a present in that case, and then you can check for this periodically (roughly 33hz is desirable) and make sure you refresh the screen with Present or SwapBuffers to allow the overlay to do it's work.</para>

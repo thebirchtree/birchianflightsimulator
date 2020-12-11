@@ -71,7 +71,7 @@ namespace HeathenEngineering.SteamApi.Networking.UI
             string errorMessage;
             if (CommandParser == null || !CommandParser.TryCallCommand(data.message, false, out errorMessage))
             {
-                var isNewMessage = data.sender.UserData.SteamId.m_SteamID != SteamUser.GetSteamID().m_SteamID;
+                var isNewMessage = data.sender.userData.id.m_SteamID != SteamUser.GetSteamID().m_SteamID;
                 var prototype = isNewMessage ? othersMessagePrototype : selfMessagePrototype;
                 var go = Instantiate(prototype, collection);
                 var msg = go.GetComponent<ILobbyChatMessage>();

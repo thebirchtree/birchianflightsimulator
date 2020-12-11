@@ -20,7 +20,7 @@ namespace HeathenEngineering.SteamApi.PlayerServices
         public override void ApplyEntry(ExtendedLeaderboardEntry entry)
         {
             data = entry.Base;
-            var userData = SteamworksFoundationManager._GetUserData(entry.Base.m_steamIDUser);
+            var userData = SteamSettings.current.client.GetUserData(entry.Base.m_steamIDUser);
             avatar.LinkSteamUser(userData);
             if (!string.IsNullOrEmpty(formatString))
                 score.text = entry.Base.m_nScore.ToString(formatString);

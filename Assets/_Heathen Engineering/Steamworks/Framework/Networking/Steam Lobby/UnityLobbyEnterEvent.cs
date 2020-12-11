@@ -12,5 +12,9 @@ namespace HeathenEngineering.SteamApi.Networking
     [Serializable]
     public class UnityLobbyEnterEvent : UnityEvent<LobbyEnter_t>
     { }
+
+    [Serializable]
+    public class UnityLobbyEvent : UnityEvent<SteamLobby>
+    { }
 }
 #endif

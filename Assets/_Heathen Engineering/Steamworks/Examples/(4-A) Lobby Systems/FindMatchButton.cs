@@ -7,6 +7,7 @@ using HeathenEngineering.SteamApi.Networking;
 using HeathenEngineering.SteamApi.Foundation;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Serialization;
 
 namespace HeathenEngineering.SteamApi.Networking.Demo
 {
@@ -15,17 +16,21 @@ namespace HeathenEngineering.SteamApi.Networking.Demo
     /// </summary>
     public class FindMatchButton : MonoBehaviour
     {
-        public SteamworksLobbySettings LobbySettings;
-        public LobbyHunterFilter QuickMatchFilter;
+        [FormerlySerializedAs("SteamSettings")]
+        public SteamSettings steamSettings;
+        [FormerlySerializedAs("LobbySettings")]
+        public SteamworksLobbySettings lobbySettings;
+        [FormerlySerializedAs("QuickMatchFilter")]
+        public LobbyHunterFilter quickMatchFilter;
         public Button quickMatchButton;
         public Text quickMatchLabel;
 
         void Update()
         {
-            quickMatchButton.interactable = !LobbySettings.Manager.IsSearching && !LobbySettings.Manager.IsQuickSearching;
+            quickMatchButton.interactable = !lobbySettings.Manager.IsSearching && !lobbySettings.Manager.IsQuickSearching;
             if (quickMatchButton.interactable)
             {
-                if (!LobbySettings.InLobby)
+                if (!lobbySettings.InLobby)
                     quickMatchLabel.text = "Quick Match";
                 else
                     quickMatchLabel.text = "Leave Lobby";
@@ -38,10 +43,21 @@ namespace HeathenEngineering.SteamApi.Networking.Demo
 
         public void SimpleFindMatch()
         {
-            if (!LobbySettings.InLobby)
-                LobbySettings.Manager.QuickMatch(QuickMatchFilter, SteamworksFoundationManager.Instance.UserData.DisplayName, true);
+            if (!lobbySettings.InLobby)
+            {
+                Debug.Log("[FindMatchButton.SimpleFindMatch] Startomg a quickmatch search for a lobby that matches the filter defined in [FindMatchButton.quickMatchFilter].");
+                lobbySettings.Manager.QuickMatch(quickMatchFilter, steamSettings.client.userData.DisplayName, true);
+            }
             else
-                LobbySettings.Manager.LeaveLobby();
+            {
+                lobbySettings.LeaveAllLobbies();
+            }
+        }
+
+        public void CreateMatch()
+        {
+            Debug.Log("[FindMatchButton.CreateMatch] Quick match found 0 matches, creating a new lobby with 4 slots.");
+            lobbySettings.CreateLobby(Steamworks.ELobbyType.k_ELobbyTypePublic, 4);
         }
 
         public void GetHelp()
@@ -51,7 +67,18 @@ namespace HeathenEngineering.SteamApi.Networking.Demo
 
         public void KickMember(string id)
         {
-            LobbySettings.KickMember(new Steamworks.CSteamID(ulong.Parse(id)));
+            lobbySettings.KickMember(new Steamworks.CSteamID(ulong.Parse(id)));
+        }
+
+        public void OnEnterLobby(SteamLobby lobby)
+        {
+            lobby.Name = steamSettings.client.userData.DisplayName + "'s Lobby";
+            Debug.Log("Entered lobby: " + lobby.Name);
+        }
+
+        public void OnExitLobby(SteamLobby lobby)
+        {
+            Debug.Log("Exiting lobby: " + lobby.Name);
         }
     }
 }

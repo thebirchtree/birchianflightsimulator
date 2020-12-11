@@ -6,22 +6,32 @@
 using HeathenEngineering.SteamApi.Foundation;
 using HeathenEngineering.Tools;
 using Steamworks;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace HeathenEngineering.SteamApi.Networking
 {
     /// <summary>
-    /// Manages Steam Lobby searches and connections
+    /// Handles registration of Steam callbacks for the Steam Matchmaking system aka Steam Lobby.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This component simply reflects the features and funcitons defined on the <see cref="SteamworksLobbySettings"/>, it does not define any data or provide any funcitonality not present on the <see cref="SteamworksLobbySettings"/> object.
+    /// The intended use is that you will use this object to initalize the <see cref="SteamworksLobbySettings"/> object referenced at <see cref="LobbySettings"/>, this happens when this object is enabled. 
+    /// You forgo using this componenet and instead use <see cref="SteamworksLobbySettings"/> in your own Lobby Manager. To do so simply add a reference to your lobby manager of:
+    /// <code>public SteamworksLobbySettings lobbySettings;</code>
+    /// Make sure you drag a <see cref="SteamworksLobbySettings"/> scriptable object to the reference on your lobby manager.
+    /// Next add the <see cref="ISteamworksLobbyManager"/> interface as a reference to your lobby manager and implament its member funcitons ... in most cases you will default the members of <see cref="ISteamworksLobbyManager"/> to call the corasponding method on <see cref="SteamworksLobbySettings"/>.
+    /// Implamenting the <see cref="ISteamworksLobbyManager"/> interface insures that other systems that use use lobby manager such as lobby browser can still interact with your custom lobby manager, <see cref="SteamLobbyDisplayList"/> and <see cref="UI.SteamworksLobbyChat"/> both depend on the <see cref="SteamworksLobbySettings.Manager"/> reference pointing to a valid <see cref="ISteamworksLobbyManager"/>.
+    /// The <see cref="SteamLobbyDisplayList"/> and <see cref="UI.SteamworksLobbyChat"/> call through the <see cref="SteamworksLobbySettings"/> object to the <see cref="ISteamworksLobbyManager"/> to execute funciton so that any custom logic you want to run on these calls before or after call to the underlying lobby system can be implamented in your own custom lobby manager.
+    /// </para>
+    /// </remarks>
     public class SteamworksLobbyManager : HeathenBehaviour, ISteamworksLobbyManager
     {
         public SteamworksLobbySettings LobbySettings;
 
         #region Events
-        public UnityEvent LobbyDataUpdateFailed = new UnityEvent();
-        public UnityEvent OnKickedFromLobby = new UnityEvent();
         /// <summary>
         /// Occures when a request to join the lobby has been recieved such as through Steam's invite friend dialog in the Steam Overlay
         /// </summary>
@@ -34,34 +44,12 @@ namespace HeathenEngineering.SteamApi.Networking
         /// Occures when a lobby is created by the player
         /// </summary>
         public UnityLobbyCreatedEvent OnLobbyCreated = new UnityLobbyCreatedEvent();
-        /// <summary>
-        /// Occures when the owner of the currently tracked lobby changes
-        /// </summary>
-        public SteamworksLobbyMemberEvent OnOwnershipChange = new SteamworksLobbyMemberEvent();
-        /// <summary>
-        /// Occures when a member joins the lobby
-        /// </summary>
-        public SteamworksLobbyMemberEvent OnMemberJoined = new SteamworksLobbyMemberEvent();
-        /// <summary>
-        /// Occures when a member leaves the lobby
-        /// </summary>
-        public SteamworksLobbyMemberEvent OnMemberLeft = new SteamworksLobbyMemberEvent();
-        /// <summary>
-        /// Occures when Steam metadata for a member changes
-        /// </summary>
-        public SteamworksLobbyMemberEvent OnMemberDataChanged = new SteamworksLobbyMemberEvent();
+        
         /// <summary>
         /// Occures when the player joins a lobby
         /// </summary>
-        public UnityLobbyEnterEvent OnLobbyEnter = new UnityLobbyEnterEvent();
-        /// <summary>
-        /// Occures when the player leaves a lobby
-        /// </summary>
-        public UnityEvent OnLobbyExit = new UnityEvent();
-        /// <summary>
-        /// Occures when lobby metadata changes
-        /// </summary>
-        public UnityEvent OnLobbyDataChanged = new UnityEvent();
+        public UnityLobbyEvent OnLobbyEnter = new UnityLobbyEvent();
+        public UnityLobbyEvent OnLobbyExit = new UnityLobbyEvent();
         /// <summary>
         /// Occures when the host of the lobby starts the game e.g. sets game server data on the lobby
         /// </summary>
@@ -105,80 +93,44 @@ namespace HeathenEngineering.SteamApi.Networking
         #endregion
 
         /// <summary>
-        /// Checks if a search is currently running
+        /// True while the system is waiting for search result responce
         /// </summary>
+        /// <remarks>
+        /// </remarks>
         public bool IsSearching
         {
             get { return LobbySettings.IsSearching; }
         }
 
+        /// <summary>
+        /// Returns true while the system is performing a quick search
+        /// </summary>
         public bool IsQuickSearching
         {
             get { return LobbySettings.IsQuickSearching; }
         }
 
         #region Unity Methods
-        private void Start()
-        {
-            if (LobbySettings == null)
-            {
-                Debug.LogWarning("Lobby settings not found ... creating default settings");
-                LobbySettings = ScriptableObject.CreateInstance<SteamworksLobbySettings>();
-                LobbySettings.MaxMemberCount = new Scriptable.IntReference(250);
-                LobbySettings.Members = new List<SteamworksLobbyMember>();
-                LobbySettings.Metadata = new SteamworksLobbyMetadata();
-            }
-            else if (LobbySettings.Manager != null && (object)LobbySettings.Manager != this)
-            {
-                Debug.LogWarning("Lobby settings already references a manager, this lobby manager will overwrite it. Please insure there is only 1 Heathen Steam Lobby Manager active at a time.");
-            }
-
-            if (LobbySettings.MaxMemberCount < 0 || LobbySettings.MaxMemberCount.Value > 250)
-            {
-                Debug.LogWarning("Lobby settings Max Member Count (" + LobbySettings.MaxMemberCount.Value.ToString() + ") is out of bounds, Min = 0, Max = 250, the value will be clamped to the valid range.");
-            }
-
-            LobbySettings.MaxMemberCount.Value = Mathf.Clamp(LobbySettings.MaxMemberCount.Value, 0, 250);
-            LobbySettings.Manager = this;
-        }
-
         private void OnEnable()
         {
             if (LobbySettings == null)
             {
                 Debug.LogWarning("Lobby settings not found ... creating default settings");
                 LobbySettings = ScriptableObject.CreateInstance<SteamworksLobbySettings>();
-                LobbySettings.MaxMemberCount.Value = 250;
-                LobbySettings.Members = new List<SteamworksLobbyMember>();
-                LobbySettings.Metadata = new SteamworksLobbyMetadata();
             }
             else if (LobbySettings.Manager != null && (object)LobbySettings.Manager != this)
             {
-                Debug.LogWarning("Lobby settings already references a manager, this lobby manager will overwrite it. Please insure there is only 1 Heathen Steam Lobby Manager active at a time.");
+                Debug.LogWarning("Lobby settings already references a manager, this lobby manager will overwrite it. Please insure there is only 1 " + nameof(SteamworksLobbyManager) + " active at a time.");
             }
 
-            if (LobbySettings.MaxMemberCount < 0 || LobbySettings.MaxMemberCount > 250)
-            {
-                Debug.LogWarning("Lobby settings Max Member Count (" + LobbySettings.MaxMemberCount.Value.ToString() + ") is out of bounds, Min = 0, Max = 250, the value will be clamped to the valid range.");
-            }
-
-            LobbySettings.MaxMemberCount.Value = Mathf.Clamp(LobbySettings.MaxMemberCount.Value, 0, 250);
             LobbySettings.Manager = this;
-            LobbySettings.RegisterCallbacks();
-            Debug.Log("Lobby settings registered with Max Member Count = " + LobbySettings.MaxMemberCount.Value.ToString() + ".");
+            LobbySettings.Initalize();
 
-            LobbySettings.LobbyDataUpdateFailed.AddListener(LobbyDataUpdateFailed.Invoke);
-            LobbySettings.OnKickedFromLobby.AddListener(OnKickedFromLobby.Invoke);
             LobbySettings.OnGameLobbyJoinRequest.AddListener(OnGameLobbyJoinRequest.Invoke);
             LobbySettings.OnLobbyMatchList.AddListener(OnLobbyMatchList.Invoke);
             LobbySettings.OnLobbyCreated.AddListener(OnLobbyCreated.Invoke);
-            LobbySettings.OnOwnershipChange.AddListener(OnOwnershipChange.Invoke);
-            LobbySettings.OnMemberJoined.AddListener(OnMemberJoined.Invoke);
-            LobbySettings.OnMemberLeft.AddListener(OnMemberLeft.Invoke);
-            LobbySettings.OnMemberDataChanged.AddListener(OnMemberDataChanged.Invoke);
-            LobbySettings.OnLobbyEnter.AddListener(OnLobbyEnter.Invoke);
             LobbySettings.OnLobbyExit.AddListener(OnLobbyExit.Invoke);
-            LobbySettings.OnLobbyDataChanged.AddListener(OnLobbyDataChanged.Invoke);
+            LobbySettings.OnLobbyEnter.AddListener(OnLobbyEnter.Invoke);
             LobbySettings.OnGameServerSet.AddListener(OnGameServerSet.Invoke);
             LobbySettings.OnLobbyChatUpdate.AddListener(OnLobbyChatUpdate.Invoke);
             LobbySettings.QuickMatchFailed.AddListener(QuickMatchFailed.Invoke);
@@ -197,45 +149,81 @@ namespace HeathenEngineering.SteamApi.Networking
             {
                 if (LobbySettings != null && LobbySettings.Manager == (ISteamworksLobbyManager)this)
                 {
-                    //This should ideally be a Leave Lobby call however in editor this would cause a crash
-                    LobbySettings.SetLobbyId(CSteamID.Nil);
                     LobbySettings.Manager = null;
-                    LobbySettings.LobbyOwner = null;
-                    LobbySettings.Members = new List<SteamworksLobbyMember>();
-                    LobbySettings.Metadata = new SteamworksLobbyMetadata();
+
+                    LobbySettings.OnGameLobbyJoinRequest.RemoveListener(OnGameLobbyJoinRequest.Invoke);
+                    LobbySettings.OnLobbyMatchList.RemoveListener(OnLobbyMatchList.Invoke);
+                    LobbySettings.OnLobbyCreated.RemoveListener(OnLobbyCreated.Invoke);
+                    LobbySettings.OnLobbyExit.RemoveListener(OnLobbyExit.Invoke);
+                    LobbySettings.OnLobbyEnter.RemoveListener(OnLobbyEnter.Invoke);
+                    LobbySettings.OnGameServerSet.RemoveListener(OnGameServerSet.Invoke);
+                    LobbySettings.OnLobbyChatUpdate.RemoveListener(OnLobbyChatUpdate.Invoke);
+                    LobbySettings.QuickMatchFailed.RemoveListener(QuickMatchFailed.Invoke);
+                    LobbySettings.SearchStarted.RemoveListener(SearchStarted.Invoke);
+                    LobbySettings.OnChatMessageReceived.RemoveListener(OnChatMessageReceived.Invoke);
+                    LobbySettings.ChatMemberStateChangeEntered.RemoveListener(ChatMemberStateChangeEntered.Invoke);
+                    LobbySettings.ChatMemberStateChangeLeft.RemoveListener(ChatMemberStateChangeLeft.Invoke);
+                    LobbySettings.ChatMemberStateChangeDisconnected.RemoveListener(ChatMemberStateChangeDisconnected.Invoke);
+                    LobbySettings.ChatMemberStateChangeKicked.RemoveListener(ChatMemberStateChangeKicked.Invoke);
+                    LobbySettings.ChatMemberStateChangeBanned.RemoveListener(ChatMemberStateChangeBanned.Invoke);
                 }
             }
             catch { }
         }
         #endregion
-        
+
+        #region Deprecated Members
+        /// <summary>
+        /// Depricated create lobby command.
+        /// This will throw an exception if called and its use will appear as an error in your compiler.
+        /// </summary>
+        /// <param name="lobbyFilter"></param>
+        /// <param name="lobbyName"></param>
+        /// <param name="lobbyType"></param>
+        [Obsolete("CreateLobby(LobbyHunterFilter lobbyFilter, string lobbyName, ELobbyType lobbyType) is deprecated, please use CreateLobby(ELobbyType lobbyType, int memberCountLimit) instead.", true)]
         public void CreateLobby(LobbyHunterFilter LobbyFilter, string LobbyName = "", ELobbyType lobbyType = ELobbyType.k_ELobbyTypePublic)
         {
-            LobbySettings.CreateLobby(LobbyFilter, LobbyName, lobbyType);
+            throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Depricated leve lobby command.
+        /// This will throw an exception if called and its use will appear as an error in your compiler.
+        /// </summary>
+        [Obsolete("LeaveLobby is deprecated, please use the Leave method available on the SteamLobby object to leave a specific lobby, e.g. LobbySettings.lobbies[0].Leave();", true)]
+        public void LeaveLobby()
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
+
+        /// <summary>
+        /// Creates a new empty (without metadata) lobby. The user will be added to the lobby on creation
+        /// </summary>
+        /// <param name="lobbyType">The type of lobby to be created ... see Valve's documentation regarding ELobbyType for more informaiton</param>
+        /// <param name="memberCountLimit">The limit on the number of users that can join this lobby</param>
+        public void CreateLobby(ELobbyType lobbyType, int memberCountLimit)
+        {
+            LobbySettings.CreateLobby(lobbyType, memberCountLimit);
+        }
+
+        /// <summary>
+        /// Joins a steam lobby
+        /// </summary>
+        /// <param name="lobbyId">The ID of the lobby to join</param>
+        /// <remarks>
+        /// See <see href="https://partner.steamgames.com/doc/api/ISteamMatchmaking#JoinLobby">JoinLobby</see> in Valve's documentation for more details.
+        /// </remarks>
         public void JoinLobby(CSteamID lobbyId)
         {
-            if(LobbySettings == null)
-            {
-                LobbySettings = ScriptableObject.CreateInstance<SteamworksLobbySettings>();
-            }
-
             LobbySettings.JoinLobby(lobbyId);
         }
 
-        public void LeaveLobby()
-        {
-            if (LobbySettings != null)
-            {
-                LobbySettings.LeaveLobby();
-            }
-            else
-            {
-                Debug.LogWarning("[HeatehnSteamLobbyManager|LeaveLobby] attempted to leave the lobby while [HeathenSteamLobbyManager|LobbySettings] is null");
-            }
-        }
-        
+        /// <summary>
+        /// Searches for a matching lobby according to the provided filter data.
+        /// Note that a search will only start if no search is currently running.
+        /// </summary>
+        /// <param name="LobbyFilter">Describes the metadata to search for in a lobby</param>
         public void FindMatch(LobbyHunterFilter LobbyFilter)
         {
             if (LobbySettings != null)
@@ -267,6 +255,10 @@ namespace HeathenEngineering.SteamApi.Networking
             }
         }
 
+        /// <summary>
+        /// Terminates a quick search process
+        /// Note that lobby searches are asynchronious and result may return after the cancelation
+        /// </summary>
         public void CancelQuickMatch()
         {
             if (LobbySettings != null)
@@ -279,64 +271,91 @@ namespace HeathenEngineering.SteamApi.Networking
             }
         }
 
+        /// <summary>
+        /// Terminates a standard search
+        /// Note that lobby searches are asynchronious and result may return after the cancelation
+        /// </summary>
         public void CancelStandardSearch()
         {
-            if (LobbySettings != null)
-            {
-                LobbySettings.CancelStandardSearch();
-            }
-            else
-            {
-                Debug.LogWarning("[HeatehnSteamLobbyManager|CancelStandardSearch] attempted to cancel a standard search while [HeathenSteamLobbyManager|LobbySettings] is null");
-            }
+            LobbySettings.CancelStandardSearch();
         }
 
+        /// <summary>
+        /// Sends a chat message via Valve's Lobby Chat system to the first lobby in the <see cref="lobbies"/> list
+        /// </summary>
+        /// <param name="message">The message to send</param>
+        /// <remarks>
+        /// <para>
+        /// This method exists here for support of older single lobby systems. It is recomended that you use the SendChatMessage on the specific lobby you want to send a message on or that you use the overload that takes the lobby ID.
+        /// </para>
+        /// </remarks>
         public void SendChatMessage(string message)
         {
-            if (LobbySettings != null)
-            {
-                LobbySettings.SendChatMessage(message);
-            }
-            else
-            {
-                Debug.LogWarning("[HeatehnSteamLobbyManager|SetLobbyMetadata] attempted to lobby chat message while [HeathenSteamLobbyManager|LobbySettings] is null");
-            }
+            LobbySettings.SendChatMessage(message);
         }
 
+        /// <summary>
+        /// Sets metadata on the first lobby, this can only be called by the host of the lobby
+        /// </summary>
+        /// <param name="key">The key of the metadata to set</param>
+        /// <param name="value">The value of the metadata to set</param>
+        /// <remarks>
+        /// <para>
+        /// This is here to support older single lobby code, it is recomended that you set data directly on the <see cref="SteamLobby"/> object or use the overload to specify the lobby you want to target.
+        /// </para>
+        /// </remarks>
         public void SetLobbyMetadata(string key, string value)
         {
-            if (LobbySettings != null)
-            {
-                LobbySettings.SetLobbyMetadata(key, value);
-            }
-            else
-            {
-                Debug.LogWarning("[HeatehnSteamLobbyManager|SetLobbyMetadata] attempted to set lobby metadata while [HeathenSteamLobbyManager|LobbySettings] is null");
-            }
+            LobbySettings.SetLobbyMetadata(key, value);
         }
 
+        /// <summary>
+        /// Sets metadata for the player on the first lobby
+        /// </summary>
+        /// <param name="key">The key of the metadata to set</param>
+        /// <param name="value">The value of the metadata to set</param>
         public void SetMemberMetadata(string key, string value)
         {
-            if (LobbySettings != null)
-            {
-                LobbySettings.SetMemberMetadata(key, value);
-            }
-            else
-            {
-                Debug.LogWarning("[HeatehnSteamLobbyManager|SetMemberMetadata] attempted to set member metadata while [HeathenSteamLobbyManager|LobbySettings] is null");
-            }
+            LobbySettings.SetMemberMetadata(key, value);
         }
 
+        /// <summary>
+        /// Sets the lobby game server e.g. game start using the lobby Host as the server ID
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// This assumes you want to set the game server on the first lobby. It exists to support older code that used a single lobby system.
+        /// It is recomended that you call <see cref="SteamLobby.SetGameServer"/> directly on the lobby you want or use the overload to indicate the lobby.
+        /// </para>
+        /// <para>
+        /// This will trigger GameServerSet on all members of the lobby
+        /// This should be called after the server is started
+        /// </para>
+        /// </remarks>
         public void SetLobbyGameServer()
         {
-            if (LobbySettings != null)
-            {
-                LobbySettings.SetLobbyGameServer();
-            }
-            else
-            {
-                Debug.LogWarning("[HeatehnSteamLobbyManager|SetLobbyGameServer] attempted to set the lobby game server while [HeathenSteamLobbyManager|LobbySettings] is null");
-            }
+            LobbySettings.SetLobbyGameServer();
+        }
+
+        /// <summary>
+        /// Sets the lobby game server e.g. game start
+        /// </summary>
+        /// <param name="ipAddress"></param>
+        /// <param name="port"></param>
+        /// <param name="serverId"></param>
+        /// <remarks>
+        /// <para>
+        /// This assumes you want to set the game server on the first lobby. It exists to support older code that used a single lobby system.
+        /// It is recomended that you call <see cref="SteamLobby.SetGameServer"/> directly on the lobby you want or use the overload to indicate the lobby.
+        /// </para>
+        /// <para>
+        /// This will trigger GameServerSet on all members of the lobby
+        /// This should be called after the server is started
+        /// </para>
+        /// </remarks>
+        public void SetLobbyGameServer(string address, ushort port, CSteamID steamID)
+        {
+            LobbySettings.SetLobbyGameServer(address, port, steamID);
         }
     }
 }

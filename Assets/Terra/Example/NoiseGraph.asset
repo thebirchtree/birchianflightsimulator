@@ -1,0 +1,167 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ac38ee321f44054c96eafa3726045d0, type: 3}
+  m_Name: NoiseGraph
+  m_EditorClassIdentifier: 
+  nodes:
+  - {fileID: 114285027343918574}
+  - {fileID: 114715623092473540}
+  - {fileID: 114113692964566340}
+--- !u!114 &114113692964566340
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eccb72e68f8671947922a37f1559e14a, type: 3}
+  m_Name: NoisePreviewNode
+  m_EditorClassIdentifier: 
+  graph: {fileID: 11400000}
+  position: {x: -56, y: -24}
+  ports:
+    keys:
+    - Input
+    values:
+    - _fieldName: Input
+      _node: {fileID: 114113692964566340}
+      _typeQualifiedName: Terra.Graph.Noise.AbsGeneratorNode, Assembly-CSharp, Version=1.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+      connections:
+      - fieldName: Output
+        node: {fileID: 114285027343918574}
+      _direction: 0
+      _connectionType: 1
+      _dynamic: 0
+  Input: {fileID: 0}
+--- !u!114 &114285027343918574
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70ec9f8f505468a40b61dadd88b5bd35, type: 3}
+  m_Name: RidgeNoiseNode
+  m_EditorClassIdentifier: 
+  graph: {fileID: 11400000}
+  position: {x: -408, y: -24}
+  ports:
+    keys:
+    - Exponent
+    - Offset
+    - Gain
+    - Frequency
+    - Lacunarity
+    - OctaveCount
+    - Output
+    values:
+    - _fieldName: Exponent
+      _node: {fileID: 114285027343918574}
+      _typeQualifiedName: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+        PublicKeyToken=b77a5c561934e089
+      connections: []
+      _direction: 0
+      _connectionType: 0
+      _dynamic: 0
+    - _fieldName: Offset
+      _node: {fileID: 114285027343918574}
+      _typeQualifiedName: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+        PublicKeyToken=b77a5c561934e089
+      connections: []
+      _direction: 0
+      _connectionType: 0
+      _dynamic: 0
+    - _fieldName: Gain
+      _node: {fileID: 114285027343918574}
+      _typeQualifiedName: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+        PublicKeyToken=b77a5c561934e089
+      connections: []
+      _direction: 0
+      _connectionType: 0
+      _dynamic: 0
+    - _fieldName: Frequency
+      _node: {fileID: 114285027343918574}
+      _typeQualifiedName: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+        PublicKeyToken=b77a5c561934e089
+      connections: []
+      _direction: 0
+      _connectionType: 0
+      _dynamic: 0
+    - _fieldName: Lacunarity
+      _node: {fileID: 114285027343918574}
+      _typeQualifiedName: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+        PublicKeyToken=b77a5c561934e089
+      connections: []
+      _direction: 0
+      _connectionType: 0
+      _dynamic: 0
+    - _fieldName: OctaveCount
+      _node: {fileID: 114285027343918574}
+      _typeQualifiedName: System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral,
+        PublicKeyToken=b77a5c561934e089
+      connections: []
+      _direction: 0
+      _connectionType: 0
+      _dynamic: 0
+    - _fieldName: Output
+      _node: {fileID: 114285027343918574}
+      _typeQualifiedName: Terra.Graph.Noise.AbsGeneratorNode, Assembly-CSharp, Version=1.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+      connections:
+      - fieldName: Noise
+        node: {fileID: 114715623092473540}
+      - fieldName: Input
+        node: {fileID: 114113692964566340}
+      _direction: 1
+      _connectionType: 0
+      _dynamic: 0
+  Output: {fileID: 0}
+  Frequency: 1
+  Lacunarity: 2.17
+  OctaveCount: 8
+  Exponent: 1
+  Offset: 1
+  Gain: 2
+--- !u!114 &114715623092473540
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e7bd016656de9f4da4973fa2d684812, type: 3}
+  m_Name: EndNode
+  m_EditorClassIdentifier: 
+  graph: {fileID: 11400000}
+  position: {x: -56, y: -120}
+  ports:
+    keys:
+    - Noise
+    values:
+    - _fieldName: Noise
+      _node: {fileID: 114715623092473540}
+      _typeQualifiedName: Terra.Graph.Noise.AbsGeneratorNode, Assembly-CSharp, Version=1.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+      connections:
+      - fieldName: Output
+        node: {fileID: 114285027343918574}
+      _direction: 0
+      _connectionType: 1
+      _dynamic: 0
+  Noise: {fileID: 0}

@@ -37,10 +37,10 @@ namespace HeathenEngineering.SteamApi.PlayerServices
         public SteamDataFile activeFile;
         /// <summary>
         /// <para>A list of files matched to this library that are available to be loaded.</para>
-        /// <para>This gets updated for all <see cref="SteamDataLibrary"/> objects registered to <see cref="SteamworksRemoteStorage"/> when the <see cref="SteamworksRemoteStorage.RefreshDataFilesIndex"/> method is called.</para>
+        /// <para>This gets updated for all <see cref="SteamDataLibrary"/> objects registered to <see cref="SteamworksRemoteStorageManager"/> when the <see cref="SteamworksRemoteStorageManager.RefreshFileList"/> method is called.</para>
         /// </summary>
         [HideInInspector]
-        public List<SteamDataFileAddress> availableFiles = new List<SteamDataFileAddress>();
+        public List<SteamworksRemoteStorageManager.FileAddress> availableFiles = new List<SteamworksRemoteStorageManager.FileAddress>();
 
         /// <summary>
         /// Saves the current library data to the current active file
@@ -54,7 +54,7 @@ namespace HeathenEngineering.SteamApi.PlayerServices
             }
 
             activeFile.linkedLibrary = this;
-            SteamworksRemoteStorage.Instance.FileWrite(activeFile);
+            SteamworksRemoteStorageManager.FileWrite(activeFile);
         }
         
         /// <summary>
@@ -72,7 +72,7 @@ namespace HeathenEngineering.SteamApi.PlayerServices
             if (!fileName.StartsWith(filePrefix))
                 fileName = filePrefix + fileName;
 
-            var result = SteamworksRemoteStorage.Instance.FileWrite(fileName, this);
+            var result = SteamworksRemoteStorageManager.FileWrite(fileName, this);
 
             if(result)
             {
@@ -91,7 +91,14 @@ namespace HeathenEngineering.SteamApi.PlayerServices
         public void SaveAsync()
         {
             activeFile.linkedLibrary = this;
-            SteamworksRemoteStorage.Instance.FileWriteAsync(activeFile);
+            var file = SteamworksRemoteStorageManager.FileWriteAsync(activeFile);
+            if(file.result != Steamworks.EResult.k_EResultFail)
+            {
+                file.Complete = results =>
+                {
+                    activeFile = results;
+                };
+            }
         }
 
         /// <summary>
@@ -109,23 +116,50 @@ namespace HeathenEngineering.SteamApi.PlayerServices
             if (!fileName.StartsWith(filePrefix))
                 fileName = filePrefix + fileName;
 
-            SteamworksRemoteStorage.Instance.FileWriteAsync(fileName, this);
+            var file = SteamworksRemoteStorageManager.FileWriteAsync(fileName, this);
+            if (file.result != Steamworks.EResult.k_EResultFail)
+            {
+                file.Complete = results =>
+                {
+                    activeFile = results;
+                };
+            }
         }
 
         public void Load(string fileName)
         {
             if (fileName.StartsWith(filePrefix))
-                SteamworksRemoteStorage.Instance.FileRead(fileName);
+            {
+                var result = SteamworksRemoteStorageManager.FileReadSteamDataFile(fileName);
+                activeFile = result;
+                result.WriteToLibrary(this);
+            }
             else
-                SteamworksRemoteStorage.Instance.FileRead(filePrefix + fileName);
+            {
+                var result = SteamworksRemoteStorageManager.FileReadSteamDataFile(filePrefix + fileName);
+                activeFile = result;
+                result.WriteToLibrary(this);
+            }
         }
 
         public void LoadAsync(string fileName)
         {
             if (fileName.StartsWith(filePrefix))
-                SteamworksRemoteStorage.Instance.FileReadAsync(fileName);
+            {
+                SteamworksRemoteStorageManager.FileReadAsync(fileName).Complete = fileResult =>
+                {
+                    activeFile = fileResult;
+                    fileResult.WriteToLibrary(this);
+                };
+            }
             else
-                SteamworksRemoteStorage.Instance.FileReadAsync(filePrefix + fileName);
+            {
+                SteamworksRemoteStorageManager.FileReadAsync(filePrefix + fileName).Complete = fileResult =>
+                {
+                    activeFile = fileResult;
+                    fileResult.WriteToLibrary(this);
+                };
+            }
         }
 
         /// <summary>
@@ -137,7 +171,8 @@ namespace HeathenEngineering.SteamApi.PlayerServices
         {
             if (activeFile != null)
             {
-                SteamworksRemoteStorage.Instance.FileRead(activeFile.address);
+                activeFile = SteamworksRemoteStorageManager.FileReadSteamDataFile(activeFile.address);
+                activeFile.WriteToLibrary(this);
             }
         }
 
@@ -150,7 +185,11 @@ namespace HeathenEngineering.SteamApi.PlayerServices
         {
             if (activeFile != null)
             {
-                SteamworksRemoteStorage.Instance.FileReadAsync(activeFile.address);
+                SteamworksRemoteStorageManager.FileReadAsync(activeFile.address).Complete = results =>
+                {
+                    activeFile = results;
+                    activeFile.WriteToLibrary(this);
+                };
             }
         }
 
@@ -160,11 +199,12 @@ namespace HeathenEngineering.SteamApi.PlayerServices
         /// </summary>
         /// <param name="address"></param>
         /// <returns></returns>
-        public void Load(SteamDataFileAddress address)
+        public void Load(SteamworksRemoteStorageManager.FileAddress address)
         {
             if (!string.IsNullOrEmpty(address.fileName) && address.fileName.StartsWith(filePrefix))
             {
-                SteamworksRemoteStorage.Instance.FileRead(address);
+                activeFile = SteamworksRemoteStorageManager.FileReadSteamDataFile(address);
+                activeFile.WriteToLibrary(this);
             }
         }
 
@@ -174,11 +214,19 @@ namespace HeathenEngineering.SteamApi.PlayerServices
         /// </summary>
         /// <param name="address"></param>
         /// <returns></returns>
-        public void LoadAsync(SteamDataFileAddress address)
+        public void LoadAsync(SteamworksRemoteStorageManager.FileAddress address)
         {
             if (!string.IsNullOrEmpty(address.fileName) && address.fileName.StartsWith(filePrefix))
             {
-                SteamworksRemoteStorage.Instance.FileReadAsync(address);
+                var nDataFile = SteamworksRemoteStorageManager.FileReadAsync(address);
+                if(nDataFile.result != Steamworks.EResult.k_EResultFail)
+                {
+                    nDataFile.Complete = results =>
+                    {
+                        activeFile = results;
+                        activeFile.WriteToLibrary(this);
+                    };
+                }
             }
         }
 

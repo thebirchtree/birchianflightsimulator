@@ -4,6 +4,7 @@
 
 #if !DISABLESTEAMWORKS
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 
 namespace HeathenEngineering.SteamApi.Foundation.UI
 {
@@ -15,27 +16,33 @@ namespace HeathenEngineering.SteamApi.Foundation.UI
         /// <summary>
         /// Occures when the icon is clicked once with the left mouse button
         /// </summary>
-        public UnityPersonaEvent OnLeftClick;
+        [FormerlySerializedAs("OnLeftClick")]
+        public UnityPersonaEvent onLeftClick;
         /// <summary>
         /// Occures when the icon is clicked once with the middle mouse button
         /// </summary>
-        public UnityPersonaEvent OnMiddleClick;
+        [FormerlySerializedAs("OnMiddleClick")]
+        public UnityPersonaEvent onMiddleClick;
         /// <summary>
         /// Occures when the icon is clicked once with the right mouse button
         /// </summary>
-        public UnityPersonaEvent OnRightClick;
+        [FormerlySerializedAs("OnRightClick")]
+        public UnityPersonaEvent onRightClick;
         /// <summary>
         /// Occures when the icon is double clicked with the left mouse button
         /// </summary>
-        public UnityPersonaEvent OnLeftDoubleClick;
+        [FormerlySerializedAs("OnLeftDoubleClick")]
+        public UnityPersonaEvent onLeftDoubleClick;
         /// <summary>
         /// Occures when the icon is double clicked with the middle mouse button
         /// </summary>
-        public UnityPersonaEvent OnMiddleDoubleClick;
+        [FormerlySerializedAs("OnMiddleDoubleClick")]
+        public UnityPersonaEvent onMiddleDoubleClick;
         /// <summary>
         /// Occures when the icon is double clicked with the right mouse button
         /// </summary>
-        public UnityPersonaEvent OnRightDoubleClick;
+        [FormerlySerializedAs("OnRightDoubleClick")]
+        public UnityPersonaEvent onRightDoubleClick;
 
         /// <summary>
         /// handler for <see cref="IPointerClickHandler"/> see the Unity SDK for more information.
@@ -46,23 +53,23 @@ namespace HeathenEngineering.SteamApi.Foundation.UI
             if(eventData.button == PointerEventData.InputButton.Left)
             {
                 if (eventData.clickCount > 1)
-                    OnLeftDoubleClick.Invoke(UserData);
+                    onLeftDoubleClick.Invoke(userData);
                 else
-                    OnLeftClick.Invoke(UserData);
+                    onLeftClick.Invoke(userData);
             }
             else if (eventData.button == PointerEventData.InputButton.Right)
             {
                 if (eventData.clickCount > 1)
-                    OnRightDoubleClick.Invoke(UserData);
+                    onRightDoubleClick.Invoke(userData);
                 else
-                    OnRightClick.Invoke(UserData);
+                    onRightClick.Invoke(userData);
             }
             else if (eventData.button == PointerEventData.InputButton.Middle)
             {
                 if (eventData.clickCount > 1)
-                    OnMiddleDoubleClick.Invoke(UserData);
+                    onMiddleDoubleClick.Invoke(userData);
                 else
-                    OnMiddleClick.Invoke(UserData);
+                    onMiddleClick.Invoke(userData);
             }
         }
     }

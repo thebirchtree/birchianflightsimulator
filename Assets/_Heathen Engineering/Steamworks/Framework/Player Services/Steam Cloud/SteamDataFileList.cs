@@ -4,12 +4,14 @@
 
 #if !DISABLESTEAMWORKS
 using HeathenEngineering.Scriptable;
+using Steamworks;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using static HeathenEngineering.SteamApi.PlayerServices.SteamworksRemoteStorageManager;
 
 namespace HeathenEngineering.SteamApi.PlayerServices.UI
 {
@@ -54,11 +56,11 @@ namespace HeathenEngineering.SteamApi.PlayerServices.UI
                 return Library.activeFile;
             }
         }
-        private SteamDataFileAddress? s_SelectedFile;
+        private FileAddress? s_SelectedFile;
         /// <summary>
         /// The address if any of the currenltly selected <see cref="SteamDataFile"/> object.
         /// </summary>
-        public SteamDataFileAddress? SelectedFile
+        public FileAddress? SelectedFile
         {
             get
             {
@@ -87,7 +89,7 @@ namespace HeathenEngineering.SteamApi.PlayerServices.UI
         /// </summary>
         public void Refresh()
         {
-            SteamworksRemoteStorage.Instance.RefreshDataFilesIndex();
+            RefreshFileList();
             var temp = new List<GameObject>();
             foreach(Transform child in Container)
             {
@@ -122,7 +124,7 @@ namespace HeathenEngineering.SteamApi.PlayerServices.UI
         /// Returns the address if any of the most resent file saved.
         /// </summary>
         /// <returns></returns>
-        public SteamDataFileAddress? GetLatest()
+        public FileAddress? GetLatest()
         {
             if (Library.availableFiles.Count > 0)
                 return Library.availableFiles[0];
@@ -142,7 +144,7 @@ namespace HeathenEngineering.SteamApi.PlayerServices.UI
         /// Selectes a specific file by address
         /// </summary>
         /// <param name="address"></param>
-        public void Select(SteamDataFileAddress address)
+        public void Select(FileAddress address)
         {
             SelectedFile = address;
         }
@@ -179,7 +181,7 @@ namespace HeathenEngineering.SteamApi.PlayerServices.UI
         public void DeleteSelected()
         {
             if (SelectedFile.HasValue)
-                SteamworksRemoteStorage.Instance.FileDelete(SelectedFile.Value);
+                FileDelete(SelectedFile.Value);
 
             Refresh();
         }
@@ -190,7 +192,7 @@ namespace HeathenEngineering.SteamApi.PlayerServices.UI
         public void ForgetSelected()
         {
             if (SelectedFile.HasValue)
-                SteamworksRemoteStorage.Instance.FileForget(SelectedFile.Value);
+                SteamRemoteStorage.FileForget(SelectedFile.Value.fileName);
         }
 
         /// <summary>

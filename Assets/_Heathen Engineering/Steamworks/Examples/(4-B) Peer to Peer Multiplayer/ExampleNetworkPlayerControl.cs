@@ -8,6 +8,7 @@ using UnityEngine;
 using Mirror;
 using HeathenEngineering.SteamApi.Foundation;
 using HeathenEngineering.SteamApi.Foundation.UI;
+using UnityEngine.Serialization;
 
 namespace HeathenEngineering.SteamApi.Networking.Demo
 {
@@ -17,7 +18,9 @@ namespace HeathenEngineering.SteamApi.Networking.Demo
     /// </summary>
     public class ExampleNetworkPlayerControl : NetworkBehaviour
     {
-        public SteamworksLobbySettings LobbySettings;
+        public SteamSettings steamSettings;
+        [FormerlySerializedAs("LobbySettings")]
+        public SteamworksLobbySettings lobbySettings;
         public Transform selfTransform;
         public SteamUserData authorityUser;
         public float speed = 0.25f;
@@ -51,11 +54,8 @@ namespace HeathenEngineering.SteamApi.Networking.Demo
             if (steamId == CSteamID.Nil.m_SteamID)
                 return;
 
-            authorityUser = SteamworksFoundationManager.Instance.Settings.GetUserData(new CSteamID(steamId));
+            authorityUser = steamSettings.client.GetUserData(new CSteamID(steamId));
             SteamIcon.LinkSteamUser(authorityUser);
-
-            if (string.IsNullOrEmpty(authorityUser.DisplayName))
-                authorityUser.DisplayName = "Unknown User";
 
             Debug.Log("Linking persona data for: [" + steamId.ToString() + "] " + (string.IsNullOrEmpty(authorityUser.DisplayName) ? "Unknown User" : authorityUser.DisplayName));
         }

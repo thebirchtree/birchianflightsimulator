@@ -20,8 +20,6 @@ namespace HeathenEngineering.SteamApi.Editors
         public SerializedProperty focusPlayer;
         public SerializedProperty ignorePlayerRefresh;
 
-        private int tabPage = 0;
-
         private void OnEnable()
         {
             Settings = serializedObject.FindProperty("Settings");

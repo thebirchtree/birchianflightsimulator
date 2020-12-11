@@ -1019,7 +1019,7 @@ namespace HeathenEngineering.SteamApi.Editors
 
                 StringBuilder sb = new StringBuilder();
                 sb.Append("{\n\t\"appid\": ");
-                sb.Append(steamSettings.ApplicationId.m_AppId);
+                sb.Append(steamSettings.applicationId.m_AppId);
                 sb.Append(",\n\t\"items\": [");
 
                 foreach (var item in settings.ItemDefinitions)

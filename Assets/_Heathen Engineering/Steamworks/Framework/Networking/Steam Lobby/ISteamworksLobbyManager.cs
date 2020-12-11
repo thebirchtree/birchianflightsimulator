@@ -43,6 +43,8 @@ namespace HeathenEngineering.SteamApi.Networking
         void SetMemberMetadata(string key, string value);
 
         void SetLobbyGameServer();
+
+        void SetLobbyGameServer(string address, ushort port, CSteamID steamID);
     }
 }
 #endif

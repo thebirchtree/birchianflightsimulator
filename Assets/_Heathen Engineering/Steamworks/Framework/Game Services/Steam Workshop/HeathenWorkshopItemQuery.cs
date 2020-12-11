@@ -17,7 +17,6 @@ namespace HeathenEngineering.SteamApi.GameServices
         public uint matchedRecordCount = 0;
         public uint PageCount = 1;
         private bool isAllQuery = false;
-        private bool isDetailQuery = false;
         private bool isUserQuery = false;
         private List<PublishedFileId_t> FileIds = new List<PublishedFileId_t>();
         private EUserUGCList listType;
@@ -47,7 +46,6 @@ namespace HeathenEngineering.SteamApi.GameServices
                 matchedRecordCount = 0,
                 PageCount = 1,
                 isAllQuery = true,
-                isDetailQuery = false,
                 isUserQuery = false,
                 queryType = queryType,
                 matchingType = matchingType,
@@ -68,7 +66,6 @@ namespace HeathenEngineering.SteamApi.GameServices
                 matchedRecordCount = 0,
                 PageCount = 1,
                 isAllQuery = true,
-                isDetailQuery = false,
                 isUserQuery = false,
                 FileIds = list,
                 Page = 1,
@@ -85,7 +82,6 @@ namespace HeathenEngineering.SteamApi.GameServices
                 matchedRecordCount = 0,
                 PageCount = 1,
                 isAllQuery = false,
-                isDetailQuery = false,
                 isUserQuery = true,
                 listType = listType,
                 sortOrder = sortOrder,

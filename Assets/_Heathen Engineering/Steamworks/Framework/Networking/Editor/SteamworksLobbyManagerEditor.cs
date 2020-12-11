@@ -127,57 +127,6 @@ namespace HeathenEngineering.SteamApi.Editors
                 EditorGUILayout.HelpBox("You should provide a Lobby Settings object here for easier use with other components.", MessageType.Warning);
             }
             EditorGUILayout.PropertyField(LobbySettings);
-
-            if (pManager.LobbySettings != null)
-            {
-                EditorGUILayout.BeginHorizontal();
-                if (pManager.LobbySettings != null)
-                {
-                    var v = EditorGUILayout.EnumPopup("Max Distance Filter", pManager.LobbySettings.MaxDistanceFilter);
-                    if ((ELobbyDistanceFilter)v != pManager.LobbySettings.MaxDistanceFilter)
-                    {
-                        pManager.LobbySettings.MaxDistanceFilter = (ELobbyDistanceFilter)v;
-                        EditorUtility.SetDirty(pManager.LobbySettings);
-                        if (pManager.LobbySettings.MaxMemberCount.Variable != null)
-                            EditorUtility.SetDirty(pManager.LobbySettings.MaxMemberCount.Variable);
-                    }
-                }
-                EditorGUILayout.EndHorizontal();
-
-                EditorGUILayout.BeginHorizontal();
-                if (pManager.LobbySettings != null)
-                {
-                    var v = EditorGUILayout.IntField("Max Member Count", pManager.LobbySettings.MaxMemberCount.Value);
-                    if (v != pManager.LobbySettings.MaxMemberCount)
-                    {
-                        pManager.LobbySettings.MaxMemberCount.Value = v;
-                        EditorUtility.SetDirty(pManager.LobbySettings);
-                        if (pManager.LobbySettings.MaxMemberCount.Variable != null)
-                            EditorUtility.SetDirty(pManager.LobbySettings.MaxMemberCount.Variable);
-                    }
-                }
-                EditorGUILayout.EndHorizontal();
-
-                DrawKeyList();
-
-                bool HasLobby = pManager.LobbySettings.lobbyId != CSteamID.Nil;
-                int MemberCount = pManager.LobbySettings.Members != null ? pManager.LobbySettings.Members.Count : 0;
-                if (HasLobby)
-                {
-                    var message = "Tracking lobby!\nMember Count = " + MemberCount.ToString();
-
-                    if (pManager.LobbySettings.Metadata.Records != null && pManager.LobbySettings.Metadata.Records.Count > 0)
-                    {
-                        message += "\nLobby Metadata:";
-                        foreach (var r in pManager.LobbySettings.Metadata.Records)
-                        {
-                            message += "\n" + r.key + " = " + r.value;
-                        }
-                    }
-
-                    EditorGUILayout.HelpBox(message, MessageType.Info);
-                }
-            }
         }
 
         private void DrawCommonEventsTab()
@@ -185,12 +134,12 @@ namespace HeathenEngineering.SteamApi.Editors
             EditorGUILayout.PropertyField(OnLobbyCreated);
             EditorGUILayout.PropertyField(OnLobbyEnter);
             EditorGUILayout.PropertyField(OnLobbyExit);
-            EditorGUILayout.PropertyField(OnLobbyDataChanged);
-            EditorGUILayout.PropertyField(OnMemberJoined);
-            EditorGUILayout.PropertyField(OnMemberLeft);
-            EditorGUILayout.PropertyField(OnKickedFromLobby);
-            EditorGUILayout.PropertyField(OnMemberDataChanged);
-            EditorGUILayout.PropertyField(OnOwnershipChange);
+            //EditorGUILayout.PropertyField(OnLobbyDataChanged);
+            //EditorGUILayout.PropertyField(OnMemberJoined);
+            //EditorGUILayout.PropertyField(OnMemberLeft);
+            //EditorGUILayout.PropertyField(OnKickedFromLobby);
+            //EditorGUILayout.PropertyField(OnMemberDataChanged);
+            //EditorGUILayout.PropertyField(OnOwnershipChange);
             EditorGUILayout.PropertyField(OnGameServerSet);
         }
 
@@ -210,70 +159,6 @@ namespace HeathenEngineering.SteamApi.Editors
             EditorGUILayout.PropertyField(ChatMemberStateChangeKicked);
             EditorGUILayout.PropertyField(ChatMemberStateChangeBanned);
             EditorGUILayout.PropertyField(OnChatMessageReceived);
-        }
-
-        string tempVal = "";
-        private void DrawKeyList()
-        {
-
-            EditorGUILayout.LabelField("Current Metadata Keys");
-            int il = EditorGUI.indentLevel;
-            EditorGUI.indentLevel++;
-
-            Rect b = EditorGUILayout.GetControlRect();
-            var style = EditorStyles.miniButtonLeft;
-            Color sC = GUI.backgroundColor;
-            GUI.backgroundColor = new Color(sC.r * 0.5f, sC.g * 0.5f, sC.b * 1.25f, sC.a);
-            if (GUI.Button(new Rect(b) { x = b.width, width = 20, height = 15 }, "+", EditorStyles.miniButtonLeft))
-            {
-                GUI.backgroundColor = sC;
-                if (!string.IsNullOrEmpty(tempVal) && !pManager.LobbySettings.MemberDataKeys.Contains(tempVal))
-                {
-                    pManager.LobbySettings.MemberDataKeys.Add(tempVal);
-                    tempVal = string.Empty;
-                    EditorUtility.SetDirty(pManager.LobbySettings);
-                    GUI.FocusControl("");
-                }
-                else
-                {
-                    Debug.LogError("Member Metadata Keys must not be empty and must be unique!\nUnable to add key '" + (tempVal == string.Empty ? "<empty key>" : tempVal) + "'.");
-                }
-                return;
-            }
-            else
-            {
-                GUI.backgroundColor = sC;
-                b.width -= 20;
-                tempVal = EditorGUI.TextField(b, "[ New Key ]", tempVal);
-            }
-
-            if (pManager.LobbySettings.MemberDataKeys == null)
-                pManager.LobbySettings.MemberDataKeys = new System.Collections.Generic.List<string>();
-
-            for (int i = 0; i < pManager.LobbySettings.MemberDataKeys.Count; i++)
-            {
-                Rect r = EditorGUILayout.GetControlRect();
-                GUI.backgroundColor = new Color(sC.r * 1.25f, sC.g * 0.5f, sC.b * 0.5f, sC.a);
-                if (GUI.Button(new Rect(r) { x = r.width, width = 20, height = 15 }, "X", EditorStyles.miniButtonLeft))
-                {
-                    GUI.backgroundColor = sC;
-                    pManager.LobbySettings.MemberDataKeys.RemoveAt(i);
-                    EditorUtility.SetDirty(pManager.LobbySettings);
-                    return;
-                }
-                else
-                {
-                    GUI.backgroundColor = sC;
-                    r.width -= 20;
-                    var v = EditorGUI.TextField(r, "Metadata Key", pManager.LobbySettings.MemberDataKeys[i]);
-                    if (v != pManager.LobbySettings.MemberDataKeys[i])
-                    {
-                        pManager.LobbySettings.MemberDataKeys[i] = v;
-                        EditorUtility.SetDirty(pManager.LobbySettings);
-                    }
-                }
-            }
-            EditorGUI.indentLevel = il;
         }
     }
 }

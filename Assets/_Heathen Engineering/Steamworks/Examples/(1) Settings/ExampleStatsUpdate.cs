@@ -4,36 +4,52 @@
 
 #if !DISABLESTEAMWORKS
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace HeathenEngineering.SteamApi.Foundation.Demo
 {
+    /// <summary>
+    /// Demonstrates Achievement and Status update activity
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This is a demo script and is not inteded for prodcution use.
+    /// It does not adhere to best practices for production grade code instead it focuses on verbose demonstration of easily understood features and fucntons.
+    /// This code should be used to understand how one can use the members of the Steam Achievement and Steam Stat related objects.
+    /// </para>
+    /// </remarks>
     public class ExampleStatsUpdate : MonoBehaviour
     {
         /// <summary>
-        /// Reference to the <see cref="SteamSettings"/> object
+        /// Reference to the <see cref="steamSettings"/> object
         /// </summary>
-        public SteamSettings SteamSettings;
+        [FormerlySerializedAs("SteamSettings")]
+        public SteamSettings steamSettings;
         /// <summary>
         /// Reference to the <see cref="SteamFloatStatData"/> object
         /// </summary>
-        public SteamFloatStatData StatDataObject;
+        [FormerlySerializedAs("StatDataObject")]
+        public SteamFloatStatData statDataObject;
         /// <summary>
         /// Reference to the <see cref="SteamAchievementData"/> object
         /// </summary>
-        public SteamAchievementData WinnerAchievement;
+        [FormerlySerializedAs("WinnerAchievement")]
+        public SteamAchievementData winnerAchievement;
         /// <summary>
         /// Used to display the current stat value
         /// </summary>
-        public UnityEngine.UI.Text StatValue;
+        [FormerlySerializedAs("StatValue")]
+        public UnityEngine.UI.Text statValue;
         /// <summary>
         /// Used to display the current achievement unlock status
         /// </summary>
-        public UnityEngine.UI.Text WinnerAchievmentStatus;
+        [FormerlySerializedAs("WinnerAchievmentStatus")]
+        public UnityEngine.UI.Text winnerAchievmentStatus;
 
         private void Update()
         {
-            StatValue.text = "Feet Traveled = " + StatDataObject.Value.ToString();
-            WinnerAchievmentStatus.text = WinnerAchievement.displayName + "\n" + (WinnerAchievement.isAchieved ? "(Unlocked)" : "(Locked)");
+            statValue.text = "Feet Traveled = " + statDataObject.Value.ToString();
+            winnerAchievmentStatus.text = winnerAchievement.displayName + "\n" + (winnerAchievement.isAchieved ? "(Unlocked)" : "(Locked)");
         }
 
         /// <summary>
@@ -42,8 +58,8 @@ namespace HeathenEngineering.SteamApi.Foundation.Demo
         /// <param name="amount"></param>
         public void UpdateStatValue(float amount)
         {
-            StatDataObject.SetFloatStat(StatDataObject.Value + amount);
-            SteamSettings.StoreStatsAndAchievements();
+            statDataObject.SetFloatStat(statDataObject.Value + amount);
+            steamSettings.client.StoreStatsAndAchievements();
         }
 
         /// <summary>

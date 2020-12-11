@@ -91,7 +91,7 @@ namespace HeathenEngineering.SteamApi.GameServices
         public void SearchAll(string filter)
         {
             lastSearchString = filter;
-            ActiveQuery = HeathenWorkshopItemQuery.Create(EUGCQuery.k_EUGCQuery_RankedByTrend, EUGCMatchingUGCType.k_EUGCMatchingUGCType_Items_ReadyToUse, CreatorAppId, steamSettings.ApplicationId);
+            ActiveQuery = HeathenWorkshopItemQuery.Create(EUGCQuery.k_EUGCQuery_RankedByTrend, EUGCMatchingUGCType.k_EUGCMatchingUGCType_Items_ReadyToUse, CreatorAppId, steamSettings.applicationId);
             if (!string.IsNullOrEmpty(filter))
             {
                 SteamworksWorkshop.WorkshopSetSearchText(ActiveQuery.handle, filter);
@@ -102,7 +102,7 @@ namespace HeathenEngineering.SteamApi.GameServices
         public void PrepareSearchAll(string filter)
         {
             lastSearchString = filter;
-            ActiveQuery = HeathenWorkshopItemQuery.Create(EUGCQuery.k_EUGCQuery_RankedByTrend, EUGCMatchingUGCType.k_EUGCMatchingUGCType_Items_ReadyToUse, CreatorAppId, steamSettings.ApplicationId);
+            ActiveQuery = HeathenWorkshopItemQuery.Create(EUGCQuery.k_EUGCQuery_RankedByTrend, EUGCMatchingUGCType.k_EUGCMatchingUGCType_Items_ReadyToUse, CreatorAppId, steamSettings.applicationId);
             if (!string.IsNullOrEmpty(filter))
             {
                 SteamworksWorkshop.WorkshopSetSearchText(ActiveQuery.handle, filter);
@@ -118,7 +118,7 @@ namespace HeathenEngineering.SteamApi.GameServices
         public void SearchFavorites(string filter)
         {
             lastSearchString = filter;
-            ActiveQuery = HeathenWorkshopItemQuery.Create(SteamUser.GetSteamID().GetAccountID(), EUserUGCList.k_EUserUGCList_Favorited, EUGCMatchingUGCType.k_EUGCMatchingUGCType_Items_ReadyToUse, EUserUGCListSortOrder.k_EUserUGCListSortOrder_TitleAsc, CreatorAppId, steamSettings.ApplicationId);
+            ActiveQuery = HeathenWorkshopItemQuery.Create(SteamUser.GetSteamID().GetAccountID(), EUserUGCList.k_EUserUGCList_Favorited, EUGCMatchingUGCType.k_EUGCMatchingUGCType_Items_ReadyToUse, EUserUGCListSortOrder.k_EUserUGCListSortOrder_TitleAsc, CreatorAppId, steamSettings.applicationId);
             if (!string.IsNullOrEmpty(filter))
             {
                 SteamworksWorkshop.WorkshopSetSearchText(ActiveQuery.handle, filter);
@@ -129,7 +129,7 @@ namespace HeathenEngineering.SteamApi.GameServices
         public void PrepareSearchFavorites(string filter)
         {
             lastSearchString = filter;
-            ActiveQuery = HeathenWorkshopItemQuery.Create(SteamUser.GetSteamID().GetAccountID(), EUserUGCList.k_EUserUGCList_Favorited, EUGCMatchingUGCType.k_EUGCMatchingUGCType_Items_ReadyToUse, EUserUGCListSortOrder.k_EUserUGCListSortOrder_TitleAsc, CreatorAppId, steamSettings.ApplicationId);
+            ActiveQuery = HeathenWorkshopItemQuery.Create(SteamUser.GetSteamID().GetAccountID(), EUserUGCList.k_EUserUGCList_Favorited, EUGCMatchingUGCType.k_EUGCMatchingUGCType_Items_ReadyToUse, EUserUGCListSortOrder.k_EUserUGCListSortOrder_TitleAsc, CreatorAppId, steamSettings.applicationId);
             if (!string.IsNullOrEmpty(filter))
             {
                 SteamworksWorkshop.WorkshopSetSearchText(ActiveQuery.handle, filter);
@@ -145,7 +145,7 @@ namespace HeathenEngineering.SteamApi.GameServices
         public void SearchFollowed(string filter)
         {
             lastSearchString = filter;
-            ActiveQuery = HeathenWorkshopItemQuery.Create(SteamUser.GetSteamID().GetAccountID(), EUserUGCList.k_EUserUGCList_Followed, EUGCMatchingUGCType.k_EUGCMatchingUGCType_Items_ReadyToUse, EUserUGCListSortOrder.k_EUserUGCListSortOrder_TitleAsc, CreatorAppId, steamSettings.ApplicationId);
+            ActiveQuery = HeathenWorkshopItemQuery.Create(SteamUser.GetSteamID().GetAccountID(), EUserUGCList.k_EUserUGCList_Followed, EUGCMatchingUGCType.k_EUGCMatchingUGCType_Items_ReadyToUse, EUserUGCListSortOrder.k_EUserUGCListSortOrder_TitleAsc, CreatorAppId, steamSettings.applicationId);
             if (!string.IsNullOrEmpty(filter))
             {
                 SteamworksWorkshop.WorkshopSetSearchText(ActiveQuery.handle, filter);
@@ -156,7 +156,7 @@ namespace HeathenEngineering.SteamApi.GameServices
         public void PrepareSearchFollowed(string filter)
         {
             lastSearchString = filter;
-            ActiveQuery = HeathenWorkshopItemQuery.Create(SteamUser.GetSteamID().GetAccountID(), EUserUGCList.k_EUserUGCList_Followed, EUGCMatchingUGCType.k_EUGCMatchingUGCType_Items_ReadyToUse, EUserUGCListSortOrder.k_EUserUGCListSortOrder_TitleAsc, CreatorAppId, steamSettings.ApplicationId);
+            ActiveQuery = HeathenWorkshopItemQuery.Create(SteamUser.GetSteamID().GetAccountID(), EUserUGCList.k_EUserUGCList_Followed, EUGCMatchingUGCType.k_EUGCMatchingUGCType_Items_ReadyToUse, EUserUGCListSortOrder.k_EUserUGCListSortOrder_TitleAsc, CreatorAppId, steamSettings.applicationId);
             if (!string.IsNullOrEmpty(filter))
             {
                 SteamworksWorkshop.WorkshopSetSearchText(ActiveQuery.handle, filter);

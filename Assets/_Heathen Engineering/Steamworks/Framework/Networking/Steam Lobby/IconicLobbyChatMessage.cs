@@ -54,7 +54,7 @@ namespace HeathenEngineering.SteamApi.Networking.UI
             {
                 var go = selfTransform.parent.GetChild(siblingIndex - 1).gameObject;
                 var msg = go.GetComponent<IconicLobbyChatMessage>();
-                if(msg.data != null && msg.data.sender != null && msg.data.sender.UserData.SteamId == data.sender.UserData.SteamId)
+                if(msg.data != null && msg.data.sender != null && msg.data.sender.userData.id == data.sender.userData.id)
                 {
                     //The previous record was also from us ... hide the persona icon
                     PersonaButton.gameObject.SetActive(false);
@@ -84,7 +84,7 @@ namespace HeathenEngineering.SteamApi.Networking.UI
             this.data = data;
 
             PersonaButton.gameObject.SetActive(true);
-            PersonaButton.LinkSteamUser(data.sender.UserData);
+            PersonaButton.LinkSteamUser(data.sender.userData);
             Message.text = data.message;
             timeStamp = data.recievedTime;
             timeRecieved.text = timeStamp.ToString(timeFormat);

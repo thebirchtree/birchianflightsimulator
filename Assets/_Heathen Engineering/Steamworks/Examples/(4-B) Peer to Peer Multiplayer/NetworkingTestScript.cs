@@ -20,7 +20,7 @@ namespace HeathenEngineering.SteamApi.Networking.Demo
 
         private void Update()
         {
-            if(LobbySettings.IsHost)
+            if(LobbySettings.lobbies.Count > 0 && LobbySettings.lobbies[0].IsHost)
             {
                 ServerButton.interactable = true;
                 if(NetworkManager.singleton.isNetworkActive)
@@ -49,7 +49,7 @@ namespace HeathenEngineering.SteamApi.Networking.Demo
 
         public void OnButtonClick()
         {
-            if(LobbySettings.IsHost)
+            if (LobbySettings.lobbies.Count > 0 && LobbySettings.lobbies[0].IsHost)
             {
                 if (NetworkManager.singleton.isNetworkActive)
                 {
@@ -67,7 +67,7 @@ namespace HeathenEngineering.SteamApi.Networking.Demo
                      ***********************************************/
 
                     Debug.Log("Leaving the lobby!");
-                    LobbySettings.LeaveLobby();
+                    LobbySettings.lobbies[0].Leave();
                 }
                 else
                 {
@@ -92,7 +92,7 @@ namespace HeathenEngineering.SteamApi.Networking.Demo
                      ***********************************************/
 
                     Debug.Log("Leaving the lobby!");
-                    LobbySettings.LeaveLobby();
+                    LobbySettings.lobbies[0].Leave();
                 }
             }
         }
@@ -101,11 +101,11 @@ namespace HeathenEngineering.SteamApi.Networking.Demo
         {
             Debug.Log("Recieved the On Game Ready notification from the Steam Lobby Manager!");
 
-            if(!LobbySettings.IsHost)
+            if (LobbySettings.lobbies.Count > 0 && !LobbySettings.lobbies[0].IsHost)
             {
                 Debug.Log("Starting up the Network Client in responce to Steam Lobby Manager's On Game Ready message!");
                 //The Heathen Steam Transport uses CSteamIDs as addresses e.g. we are connecting to Steam Users not IP addresses
-                NetworkManager.singleton.networkAddress = LobbySettings.LobbyOwner.UserData.SteamId.m_SteamID.ToString();
+                NetworkManager.singleton.networkAddress = LobbySettings.lobbies[0].Owner.userData.id.m_SteamID.ToString();
                 NetworkManager.singleton.StartClient();
             }
         }

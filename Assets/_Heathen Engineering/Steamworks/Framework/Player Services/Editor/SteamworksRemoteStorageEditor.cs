@@ -11,10 +11,10 @@ using UnityEngine;
 namespace HeathenEngineering.SteamApi.Editors
 {
 
-    [CustomEditor(typeof(SteamworksRemoteStorage))]
+    [CustomEditor(typeof(SteamworksRemoteStorageManager))]
     public class SteamworksRemoteStorageEditor : Editor
     {
-        private SteamworksRemoteStorage cloud;
+        private SteamworksRemoteStorageManager cloud;
         public SerializedProperty FileReadAsyncComplete;
         public SerializedProperty FileWriteAsyncComplete;
 
@@ -31,7 +31,7 @@ namespace HeathenEngineering.SteamApi.Editors
 
         public override void OnInspectorGUI()
         {
-            cloud = target as SteamworksRemoteStorage;
+            cloud = target as SteamworksRemoteStorageManager;
 
             Rect hRect = EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("");

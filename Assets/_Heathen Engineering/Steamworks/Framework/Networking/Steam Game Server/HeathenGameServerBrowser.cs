@@ -65,7 +65,6 @@ namespace HeathenEngineering.SteamApi.Networking
             History
         }
         private SearchType searchType = SearchType.Internet;
-        private SearchType queryType = SearchType.Internet;
 
         public void OnEnable()
         {
@@ -154,7 +153,7 @@ namespace HeathenEngineering.SteamApi.Networking
             if(m_ServerListResponse == null)
                 m_ServerListResponse = new ISteamMatchmakingServerListResponse(OnServerResponded, OnServerFailedToRespond, OnRefreshComplete);
 
-            m_ServerListRequest = SteamMatchmakingServers.RequestInternetServerList(steamSettings.ApplicationId, filter.ToArray(), System.Convert.ToUInt32(filter.Count), m_ServerListResponse);
+            m_ServerListRequest = SteamMatchmakingServers.RequestInternetServerList(steamSettings.applicationId, filter.ToArray(), System.Convert.ToUInt32(filter.Count), m_ServerListResponse);
         }
 
         public void RefreshFavoriteServers()
@@ -165,7 +164,7 @@ namespace HeathenEngineering.SteamApi.Networking
             if (m_ServerListResponse == null)
                 m_ServerListResponse = new ISteamMatchmakingServerListResponse(OnServerResponded, OnServerFailedToRespond, OnRefreshComplete);
 
-            m_ServerListRequest = SteamMatchmakingServers.RequestFavoritesServerList(steamSettings.ApplicationId, filter.ToArray(), System.Convert.ToUInt32(filter.Count), m_ServerListResponse);
+            m_ServerListRequest = SteamMatchmakingServers.RequestFavoritesServerList(steamSettings.applicationId, filter.ToArray(), System.Convert.ToUInt32(filter.Count), m_ServerListResponse);
         }
 
         public void RefreshFriendServers()
@@ -176,7 +175,7 @@ namespace HeathenEngineering.SteamApi.Networking
             if (m_ServerListResponse == null)
                 m_ServerListResponse = new ISteamMatchmakingServerListResponse(OnServerResponded, OnServerFailedToRespond, OnRefreshComplete);
 
-            m_ServerListRequest = SteamMatchmakingServers.RequestFriendsServerList(steamSettings.ApplicationId, filter.ToArray(), System.Convert.ToUInt32(filter.Count), m_ServerListResponse);
+            m_ServerListRequest = SteamMatchmakingServers.RequestFriendsServerList(steamSettings.applicationId, filter.ToArray(), System.Convert.ToUInt32(filter.Count), m_ServerListResponse);
         }
 
         public void RefreshLANServers()
@@ -187,7 +186,7 @@ namespace HeathenEngineering.SteamApi.Networking
             if (m_ServerListResponse == null)
                 m_ServerListResponse = new ISteamMatchmakingServerListResponse(OnServerResponded, OnServerFailedToRespond, OnRefreshComplete);
 
-            m_ServerListRequest = SteamMatchmakingServers.RequestLANServerList(steamSettings.ApplicationId, m_ServerListResponse);
+            m_ServerListRequest = SteamMatchmakingServers.RequestLANServerList(steamSettings.applicationId, m_ServerListResponse);
         }
 
         public void RefreshSpectatorServers()
@@ -198,7 +197,7 @@ namespace HeathenEngineering.SteamApi.Networking
             if (m_ServerListResponse == null)
                 m_ServerListResponse = new ISteamMatchmakingServerListResponse(OnServerResponded, OnServerFailedToRespond, OnRefreshComplete);
 
-            m_ServerListRequest = SteamMatchmakingServers.RequestSpectatorServerList(steamSettings.ApplicationId, filter.ToArray(), System.Convert.ToUInt32(filter.Count), m_ServerListResponse);
+            m_ServerListRequest = SteamMatchmakingServers.RequestSpectatorServerList(steamSettings.applicationId, filter.ToArray(), System.Convert.ToUInt32(filter.Count), m_ServerListResponse);
         }
 
         public void RefreshHistoryServers()
@@ -209,7 +208,7 @@ namespace HeathenEngineering.SteamApi.Networking
             if (m_ServerListResponse == null)
                 m_ServerListResponse = new ISteamMatchmakingServerListResponse(OnServerResponded, OnServerFailedToRespond, OnRefreshComplete);
 
-            m_ServerListRequest = SteamMatchmakingServers.RequestHistoryServerList(steamSettings.ApplicationId, filter.ToArray(), System.Convert.ToUInt32(filter.Count), m_ServerListResponse);
+            m_ServerListRequest = SteamMatchmakingServers.RequestHistoryServerList(steamSettings.applicationId, filter.ToArray(), System.Convert.ToUInt32(filter.Count), m_ServerListResponse);
         }
 
         public void RefreshServerRules(HeathenGameServerBrowserEntery target)
@@ -320,7 +319,7 @@ namespace HeathenEngineering.SteamApi.Networking
             {
                 var serverItem = SteamMatchmakingServers.GetServerDetails(hRequest, i);
 
-                if (serverItem.m_steamID.m_SteamID != 0 && serverItem.m_nAppID == steamSettings.ApplicationId.m_AppId)
+                if (serverItem.m_steamID.m_SteamID != 0 && serverItem.m_nAppID == steamSettings.applicationId.m_AppId)
                 {
                     var entry = new HeathenGameServerBrowserEntery();
                     entry.FromGameServerItem(serverItem);

@@ -38,7 +38,7 @@ namespace HeathenEngineering.SteamApi.PlayerServices
         /// <returns></returns>
         public static bool RegisterCallbacks()
         {
-            if (SteamworksFoundationManager.Initialized)
+            if (SteamSettings.current.Initialized)
             {
                 if (!callbacksRegistered)
                 {

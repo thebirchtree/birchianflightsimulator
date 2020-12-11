@@ -2939,7 +2939,6 @@ GameObject:
   m_Component:
   - component: {fileID: 640081203}
   - component: {fileID: 640081202}
-  - component: {fileID: 640081201}
   - component: {fileID: 640081206}
   - component: {fileID: 640081204}
   - component: {fileID: 640081207}
@@ -2951,40 +2950,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &640081201
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 640081200}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 568aab4c90060bb4aac6f056da0480b2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  steamSettings: {fileID: 11400000, guid: 04b6ab2fdfc4a3448993641bdc5c8885, type: 2}
-  serverSettings: {fileID: 11400000, guid: 194a294ec66f55a4ea634c463a1cccdb, type: 2}
-  networkManager: {fileID: 640081205}
-  IsDebugging: 1
-  OnSteamInitialized:
-    m_PersistentCalls:
-      m_Calls: []
-  OnSteamInitializationError:
-    m_PersistentCalls:
-      m_Calls: []
-  GameServerShuttingDown:
-    m_PersistentCalls:
-      m_Calls: []
-  Disconnected:
-    m_PersistentCalls:
-      m_Calls: []
-  Connected:
-    m_PersistentCalls:
-      m_Calls: []
-  Failure:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!114 &640081202
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2997,45 +2962,54 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e199e0052473a9d40b85f57bdc651a0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Settings: {fileID: 11400000, guid: 04b6ab2fdfc4a3448993641bdc5c8885, type: 2}
+  settings: {fileID: 11400000, guid: 04b6ab2fdfc4a3448993641bdc5c8885, type: 2}
   _doNotDistroyOnLoad:
     Mode: 0
     m_constantValue: 0
     Variable: {fileID: 0}
-  _Initialized:
-    Mode: 0
-    m_constantValue: 0
-    Variable: {fileID: 0}
-  OnSteamInitalized:
+  onSteamInitalized:
     m_PersistentCalls:
       m_Calls: []
-  OnSteamInitalizationError:
+  onSteamInitalizationError:
     m_PersistentCalls:
       m_Calls: []
-  OnOverlayActivated:
+  onOverlayActivated:
     m_PersistentCalls:
       m_Calls: []
-  OnUserStatsRecieved:
+  onUserStatsRecieved:
     m_PersistentCalls:
       m_Calls: []
-  OnUserStatsStored:
+  onUserStatsStored:
     m_PersistentCalls:
       m_Calls: []
-  OnNumberOfCurrentPlayersResult:
+  onNumberOfCurrentPlayersResult:
     m_PersistentCalls:
       m_Calls: []
-  OnAchievementStored:
+  onAchievementStored:
     m_PersistentCalls:
       m_Calls: []
-  OnAvatarLoaded:
+  onAvatarLoaded:
     m_PersistentCalls:
       m_Calls: []
-  OnPersonaStateChanged:
+  onPersonaStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  OnRecievedFriendChatMessage:
+  onRecievedFriendChatMessage:
     m_PersistentCalls:
       m_Calls: []
+  gameServerShuttingDown:
+    m_PersistentCalls:
+      m_Calls: []
+  disconnected:
+    m_PersistentCalls:
+      m_Calls: []
+  connected:
+    m_PersistentCalls:
+      m_Calls: []
+  failure:
+    m_PersistentCalls:
+      m_Calls: []
+  networkManager: {fileID: 0}
 --- !u!4 &640081203
 Transform:
   m_ObjectHideFlags: 0
@@ -3086,8 +3060,10 @@ MonoBehaviour:
   OnServerDisconnected:
     m_PersistentCalls:
       m_Calls: []
-  messageUpdateRate: 0.03333
-  channels: 0200000000000000
+  Channels: 02000000
+  Timeout: 25
+  AllowSteamRelay: 1
+  SteamUserID: 0
 --- !u!114 &640081205
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3102,7 +3078,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dontDestroyOnLoad: 0
   runInBackground: 1
-  startOnHeadless: 0
+  autoStartServerBuild: 0
   showDebugMessages: 0
   serverTickRate: 30
   offlineScene: 
@@ -3110,6 +3086,8 @@ MonoBehaviour:
   transport: {fileID: 640081204}
   networkAddress: localhost
   maxConnections: 4
+  disconnectInactiveConnections: 0
+  disconnectInactiveTimeout: 60
   authenticator: {fileID: 0}
   playerPrefab: {fileID: 876654889313763018, guid: fd17694b39aeb544f8ab4922418540f3,
     type: 3}
@@ -3249,8 +3227,10 @@ MonoBehaviour:
   OnServerDisconnected:
     m_PersistentCalls:
       m_Calls: []
-  messageUpdateRate: 0.03333
-  channels: 0200000000000000
+  Channels: 02000000
+  Timeout: 25
+  AllowSteamRelay: 1
+  SteamUserID: 0
 --- !u!1 &645623087
 GameObject:
   m_ObjectHideFlags: 0
@@ -3813,7 +3793,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 639652986}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.99999994
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

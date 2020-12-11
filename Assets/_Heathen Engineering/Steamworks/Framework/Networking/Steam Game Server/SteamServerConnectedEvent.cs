@@ -9,7 +9,5 @@ using UnityEngine.Events;
 
 namespace HeathenEngineering.SteamApi.Networking
 {
-    [Serializable]
-    public class SteamServerConnectedEvent : UnityEvent<SteamServersConnected_t> { }
 }
 #endif

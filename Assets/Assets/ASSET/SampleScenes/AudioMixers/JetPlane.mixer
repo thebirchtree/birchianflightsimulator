@@ -7,7 +7,7 @@ AudioMixerController:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: JetPlane
-  m_OutputGroup: {fileID: 24300001, guid: a6d4125f3952b4903b9b34a4a3a5ba24, type: 2}
+  m_OutputGroup: {fileID: 0}
   m_MasterGroup: {fileID: 24300001}
   m_Snapshots:
   - {fileID: 24500003}

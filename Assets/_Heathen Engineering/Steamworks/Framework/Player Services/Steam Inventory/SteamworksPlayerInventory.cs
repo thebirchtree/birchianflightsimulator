@@ -25,7 +25,7 @@ namespace HeathenEngineering.SteamApi.PlayerServices
 
         public static bool RegisterCallbacks()
         {
-            if (SteamworksFoundationManager.Initialized)
+            if (SteamSettings.current.Initialized)
             {
                 if (!callbacksRegistered)
                 {
@@ -115,7 +115,7 @@ namespace HeathenEngineering.SteamApi.PlayerServices
                     Debug.LogException(ex2);
                 }
             }
-
+            Debug.Log("Destroying handle: " + param.m_handle.ToString());
             SteamInventory.DestroyResult(param.m_handle);
         }
         
@@ -488,7 +488,7 @@ namespace HeathenEngineering.SteamApi.PlayerServices
         /// <returns></returns>
         public static bool CheckResultSteamID(SteamInventoryResult_t resultHandle, SteamUserData steamUserExpected)
         {
-            return SteamInventory.CheckResultSteamID(resultHandle, steamUserExpected.SteamId);
+            return SteamInventory.CheckResultSteamID(resultHandle, steamUserExpected.id);
         }
 
         /// <summary>
@@ -652,7 +652,7 @@ namespace HeathenEngineering.SteamApi.PlayerServices
         /// <returns>Always returns true</returns>
         public static bool DeserializeResult(byte[] buffer, SteamUserData fromUser, Action<bool, SteamItemDetails_t[]> callback)
         {
-            return DeserializeResult(buffer, fromUser.SteamId, callback);
+            return DeserializeResult(buffer, fromUser.id, callback);
         }
 
         /// <summary>
@@ -1060,6 +1060,8 @@ namespace HeathenEngineering.SteamApi.PlayerServices
                     pendingCalls.Remove(handle);
                 }
 
+                Debug.Log("Generated new handle: " + handle.ToString());
+
                 pendingCalls.Add(handle, callRequest);
                 return true;
             }
@@ -1082,7 +1084,6 @@ namespace HeathenEngineering.SteamApi.PlayerServices
             public CSteamID SteamUserId;
             public Action<bool> BoolCallback;
             public Action<bool, SteamItemDetails_t[]> DetailCallback;
-            public Action<bool, SteamItemDef_t[]> DefinitionCallback;
             public Action<bool, byte[]> SerializationCallback;
         }
 

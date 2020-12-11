@@ -310,7 +310,7 @@ namespace HeathenEngineering.SteamApi.GameServices
             Title = itemDetails.m_rgchTitle;
             Description = itemDetails.m_rgchDescription;
             Visibility = itemDetails.m_eVisibility;
-            Author = SteamworksFoundationManager._GetUserData(itemDetails.m_ulSteamIDOwner);
+            Author = SteamSettings.current.client.GetUserData(itemDetails.m_ulSteamIDOwner);
             var previewCall = SteamRemoteStorage.UGCDownload(itemDetails.m_hPreviewFile, 1);
             m_RemoteStorageDownloadUGCResult.Set(previewCall, HandleUGCDownload);
         }
@@ -331,7 +331,7 @@ namespace HeathenEngineering.SteamApi.GameServices
             Title = itemDetails.Title;
             Description = itemDetails.Description;
             Visibility = itemDetails.Visibility;
-            Author = SteamworksFoundationManager._GetUserData(itemDetails.Author);
+            Author = SteamSettings.current.client.GetUserData(itemDetails.Author);
             previewImage = itemDetails.previewImage;
             PreviewImageLocation = itemDetails.PreviewImageLocation;
         }
@@ -487,7 +487,7 @@ namespace HeathenEngineering.SteamApi.GameServices
                 CreateFailed.Invoke(param);
             else
             {
-                Author = SteamworksFoundationManager._GetUserData(SteamUser.GetSteamID());
+                Author = SteamSettings.current.client.GetUserData(SteamUser.GetSteamID());
                 FileId = param.m_nPublishedFileId;
                 Created.Invoke(param);
             }

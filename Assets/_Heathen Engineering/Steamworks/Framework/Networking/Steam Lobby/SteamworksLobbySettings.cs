@@ -11,107 +11,79 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace HeathenEngineering.SteamApi.Networking
 {
-
+    /// <summary>
+    /// Handles configuration and tracking for Steam Lobby
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Steam allows users to be in 1 'regular' lobby and up to 2 'invisible' lobbies.
+    /// This system simply manages a list of lobbies and doesn't try to enforce Valve's rule for 1 regular and 2 invisible.
+    /// It is up to the indavidual game developer to handle lobby types and enforce rules regarding how many lobbies a user can be in.
+    /// </para>
+    /// </remarks>
     [CreateAssetMenu(menuName = "Steamworks/Networking/Lobby Settings")]
     [Serializable]
     public class SteamworksLobbySettings : ScriptableObject
     {
+        public readonly List<SteamLobby> lobbies = new List<SteamLobby>();
+
+        /// <summary>
+        /// Returns the <see cref="SteamLobby"/> object that matches the provided id
+        /// </summary>
+        /// <param name="lobbyId">The ID of the lobby to find</param>
+        /// <returns></returns>
+        /// <remarks>
+        /// <para>
+        /// This queries the <see cref="lobbies"/> member. It does not search against Valve's backend e.g. it is not a Lobby Search/browse
+        /// </para>
+        /// </remarks>
+        public SteamLobby this[CSteamID lobbyId]
+        {
+            get => lobbies.FirstOrDefault(p => p.id == lobbyId);
+        }
+
         /// <summary>
         /// Controls the further Steam distance that will be searched for a lobby
         /// </summary>
         /// <remarks>
-        /// <see cref="MaxDistanceFilter"/> is used during <see cref="QuickMatch(LobbyHunterFilter, string, bool)"/> operations to determin the maximum distance the quick mach should search when expanding.
+        /// <see cref="maxDistanceFilter"/> is used during <see cref="QuickMatch(LobbyHunterFilter, string, bool)"/> operations to determin the maximum distance the quick mach should search when expanding.
         /// </remarks>
         [Header("Quick Match Settings")]
-        public ELobbyDistanceFilter MaxDistanceFilter = ELobbyDistanceFilter.k_ELobbyDistanceFilterDefault;
+        [FormerlySerializedAs("MaxDistanceFilter")]
+        public ELobbyDistanceFilter maxDistanceFilter = ELobbyDistanceFilter.k_ELobbyDistanceFilterDefault;
+        
         /// <summary>
-        /// True if the player is in the lobby that the Steam Lobby Settings object is tracking
+        /// Is the user in a lobby
         /// </summary>
         /// <remarks>
-        /// This tests the local player's CSteamID against Valve's GetLobbyMemberData. If the method returns null then the user is not part of the tracked lobby.
+        /// <para>
+        /// This will test all lobbies listed in the <see cref="lobbies"/> field to determin if the user is a member.
+        /// If the user is a member of any of the lobbies the result will be true.
+        /// </para>
         /// </remarks>
         public bool InLobby
         {
             get
             {
-                //Lobby Member Data is supposed to return null if the player is not in the lobby or the lobby id is invalid
-                //In any other case it should return the value of the key or if none return string.empty thus if it returns null this user is not in this lobby
-                if (SteamMatchmaking.GetLobbyMemberData(LobbyId, SteamUser.GetSteamID(), "anyField") == null)
-                    return false;
-                else
+                if (lobbies.Any(p => p != null && p.User != null))
                     return true;
+                else
+                    return false;
             }
         }
+
         /// <summary>
         /// True if the system is tracking a lobby
         /// </summary>
-        /// <remarks>
-        /// This returns true if the provided lobby ID is a legitimate ID and if Valve indicates that the lobby has members.
-        /// </remarks>
         public bool HasLobby
         {
             get
             {
-                if (LobbyId != CSteamID.Nil
-                    && SteamMatchmaking.GetNumLobbyMembers(LobbyId) > 0)
-                    return true;
-                else
-                    return false;
-            }
-        }
-        /// <summary>
-        /// True if the Steam Lobby Settings object has a valid lobby and the current player is that lobby's owner
-        /// </summary>
-        /// <remarks>
-        /// This returns true if the provided lobby ID is a legitimate ID and if Valve indicates that the lobby has members and if the owner of the lobby is the current player.
-        /// </remarks>
-        public bool IsHost
-        {
-            get
-            {
-                return HasLobby && SteamUser.GetSteamID() == SteamMatchmaking.GetLobbyOwner(LobbyId);
-            }
-        }
-
-        /// <summary>
-        /// True if the tracked lobby has game server information
-        /// </summary>
-        public bool HasGameServer
-        {
-            get
-            {
-                return SteamMatchmaking.GetLobbyGameServer(LobbyId, out _, out _, out _);
-            }
-        }
-
-        /// <summary>
-        /// The game server information stored against the lobby
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        /// This data is set when the host calls <see cref="SetLobbyGameServer"/> or one of its variants. Uppon calling <see cref="SetLobbyGameServer"/> the Valve backend will raise <see cref="OnGameServerSet"/> for all members other than the host the paramiter of which also contains server data.
-        /// The typical use case of this field is when a member has join a persistent lobby after the game server has been started.
-        /// </para>
-        /// </remarks>
-        public LobbyGameServerInformation GameServerInformation
-        {
-            get
-            {
-                uint ip;
-                ushort port;
-                CSteamID id = CSteamID.Nil;
-
-                SteamMatchmaking.GetLobbyGameServer(LobbyId, out ip, out port, out id);
-
-                return new LobbyGameServerInformation()
-                {
-                    ipAddress = ip,
-                    port = port,
-                    serverId = id
-                };
+                return lobbies.Any(p => p.id != CSteamID.Nil);
             }
         }
         
@@ -124,6 +96,7 @@ namespace HeathenEngineering.SteamApi.Networking
         {
             get { return standardSearch; }
         }
+
         /// <summary>
         /// Returns true while the system is performing a quick search
         /// </summary>
@@ -131,25 +104,11 @@ namespace HeathenEngineering.SteamApi.Networking
         {
             get { return quickMatchSearch; }
         }
-        public string LobbyName;
-        [Tooltip("This will be set by the Lobby Manager when joining a lobby")]
-        protected CSteamID LobbyId;
-        public CSteamID lobbyId { get { return LobbyId; } }
-        [Tooltip("Steam will only accept values between 0 and 250 but expects a datatype of int")]
-        public IntReference MaxMemberCount = new IntReference(4);
-        [Header("Current Lobby Data")]
-        [Tooltip("These are the keys of the data that can be registered against a members metadata")]
-        public List<string> MemberDataKeys;
-        public SteamworksLobbyMember LobbyOwner;
-        public List<SteamworksLobbyMember> Members;
-        public SteamworksLobbyMetadata Metadata;
         
-
         [HideInInspector]
         public ISteamworksLobbyManager Manager;
 
         #region Internal Data
-        private bool quickMatchCreateOnFail = false;
         [NonSerialized]
         private bool standardSearch = false;
         [NonSerialized]
@@ -172,11 +131,7 @@ namespace HeathenEngineering.SteamApi.Networking
         #endregion
 
         #region Events
-        [HideInInspector]
-        public UnityEvent LobbyDataUpdateFailed;
-
-        [HideInInspector]
-        public UnityEvent OnKickedFromLobby;
+        
         /// <summary>
         /// Occures when a request to join the lobby has been recieved such as through Steam's invite friend dialog in the Steam Overlay
         /// </summary>
@@ -190,43 +145,42 @@ namespace HeathenEngineering.SteamApi.Networking
         /// <summary>
         /// Occures when a lobby is created by the player
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// The data from this event can be used to fetch the newly created lobby. A demonstration of this is availabel in the example below.
+        /// </para>
+        /// </remarks>
+        /// <example>
+        /// <code>
+        /// public SteamworksLobbySettings lobbySettings;
+        /// ...
+        /// void Start()
+        /// {
+        ///    lobbySettings.OnLobbyCreate.AddListener(HandleOnLobbyCreated);
+        /// }
+        /// ...
+        /// private void HandleOnLobbyCreated(LobbyCreated_t param)
+        /// {
+        ///    var myNewLobby = lobbySettings[param.m_ulSteamIDLobby];
+        /// }
+        /// </code>
+        /// </example>
         [HideInInspector]
         public UnityLobbyCreatedEvent OnLobbyCreated = new UnityLobbyCreatedEvent();
-        /// <summary>
-        /// Occures when the owner of the currently tracked lobby changes
-        /// </summary>
-        [HideInInspector]
-        public SteamworksLobbyMemberEvent OnOwnershipChange = new SteamworksLobbyMemberEvent();
-        /// <summary>
-        /// Occures when a member joins the lobby
-        /// </summary>
-        [HideInInspector]
-        public SteamworksLobbyMemberEvent OnMemberJoined = new SteamworksLobbyMemberEvent();
-        /// <summary>
-        /// Occures when a member leaves the lobby
-        /// </summary>
-        [HideInInspector]
-        public SteamworksLobbyMemberEvent OnMemberLeft = new SteamworksLobbyMemberEvent();
-        /// <summary>
-        /// Occures when Steam metadata for a member changes
-        /// </summary>
-        [HideInInspector]
-        public SteamworksLobbyMemberEvent OnMemberDataChanged = new SteamworksLobbyMemberEvent();
+
+
+        
         /// <summary>
         /// Occures when the player joins a lobby
         /// </summary>
         [HideInInspector]
-        public UnityLobbyEnterEvent OnLobbyEnter = new UnityLobbyEnterEvent();
+        public UnityLobbyEvent OnLobbyEnter = new UnityLobbyEvent();
         /// <summary>
         /// Occures when the player leaves a lobby
         /// </summary>
         [HideInInspector]
-        public UnityEvent OnLobbyExit = new UnityEvent();
-        /// <summary>
-        /// Occures when lobby metadata changes
-        /// </summary>
-        [HideInInspector]
-        public UnityEvent OnLobbyDataChanged = new UnityEvent();
+        public UnityLobbyEvent OnLobbyExit = new UnityLobbyEvent();
+
         /// <summary>
         /// Occures when the host of the lobby starts the game e.g. sets game server data on the lobby
         /// </summary>
@@ -283,9 +237,9 @@ namespace HeathenEngineering.SteamApi.Networking
         /// Typically called by the HeathenSteamManager.OnEnable()
         /// This registeres the Valve callbacks and CallResult deligates
         /// </summary>
-        public void RegisterCallbacks()
+        public void Initalize()
         {
-            if (SteamworksFoundationManager.Initialized)
+            if (SteamSettings.current.Initialized)
             {   
                 if (!callbacksRegistered)
                 {
@@ -300,124 +254,6 @@ namespace HeathenEngineering.SteamApi.Networking
                     m_LobbyChatMsg = Callback<LobbyChatMsg_t>.Create(HandleLobbyChatMessage);
                 }
             }
-        }
-
-        /// <summary>
-        /// Sets the tracked lobby ID and updates the relivent member data and metadata lists
-        /// </summary>
-        /// <param name="lobbyId"></param>
-        public void SetLobbyId(CSteamID lobbyId)
-        {
-            if (lobbyId == CSteamID.Nil)
-            {
-                LobbyId = CSteamID.Nil;
-                Members.Clear();
-                LobbyOwner = null;
-            }
-            else if (LobbyId != lobbyId)
-            {
-                LobbyId = lobbyId;
-                Members.Clear();
-                LobbyOwner = null;
-                CSteamID ownerId = SteamMatchmaking.GetLobbyOwner(LobbyId);
-                var count = SteamMatchmaking.GetNumLobbyMembers(LobbyId);
-                for (int i = 0; i < count; i++)
-                {
-                    var memberId = SteamMatchmaking.GetLobbyMemberByIndex(LobbyId, i);
-                    var record = ProcessLobbyMember(memberId);
-                    if (memberId == ownerId)
-                        LobbyOwner = record;
-                }
-            }
-            else
-            {
-                //We are already aware of this lobby so just refresh the owner and member data
-                CSteamID ownerId = SteamMatchmaking.GetLobbyOwner(LobbyId);
-                var count = SteamMatchmaking.GetNumLobbyMembers(LobbyId);
-                for (int i = 0; i < count; i++)
-                {
-                    var memberId = SteamMatchmaking.GetLobbyMemberByIndex(LobbyId, i);
-                    var record = ProcessLobbyMember(memberId);
-                    if (memberId == ownerId)
-                        LobbyOwner = record;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Forces an update on change of lobby ownership, this is automatically called when the original host is removed from the lobby
-        /// </summary>
-        private void HandleOwnershipChange()
-        {
-            var ownerId = SteamMatchmaking.GetLobbyOwner(LobbyId);
-            LobbyOwner = ProcessLobbyMember(ownerId);
-        }
-
-        /// <summary>
-        /// Removes the member from the settings list
-        /// </summary>
-        /// <param name="memberId">The member to remove</param>
-        /// <returns>True if the removed member was the lobby owner, otherwise false</returns>
-        private bool RemoveMember(CSteamID memberId)
-        {
-            var targetMember = Members.FirstOrDefault(p => p.UserData != null && p.UserData.SteamId == memberId);
-            Members.Remove(targetMember);
-            OnMemberLeft.Invoke(targetMember);
-
-            //Insure we remove any duplicates
-            Members.RemoveAll(p => p.UserData != null && p.UserData.SteamId == memberId);
-
-            var kickList = Metadata["z_heathenKick"];
-
-            if (kickList == null)
-                kickList = string.Empty;
-
-            if (kickList.Contains("[" + memberId.ToString() + "]"))
-            {
-                kickList = kickList.Replace("[" + memberId.ToString() + "]", string.Empty);
-                SetLobbyMetadata("z_heathenKick", kickList);
-            }
-
-            if (memberId == SteamMatchmaking.GetLobbyOwner(LobbyId))
-            {
-                HandleOwnershipChange();
-                return true;
-            }
-            else
-                return false;
-        }
-
-        /// <summary>
-        /// Called when a lobby member joins or updates metadata
-        /// </summary>
-        /// <param name="memberId"></param>
-        private SteamworksLobbyMember ProcessLobbyMember(CSteamID memberId)
-        {
-            SteamworksLobbyMember member = Members.FirstOrDefault(p => p.UserData != null && p.UserData.SteamId == memberId);
-
-            if (member == null)
-            {
-                member = new SteamworksLobbyMember();
-                member.UserData = SteamworksFoundationManager._GetUserData(memberId);
-                Members.Add(member);
-                OnMemberJoined.Invoke(member);
-            }
-
-            if (member.Metadata.Records == null)
-                member.Metadata.Records = new List<MetadataRecord>();
-            else
-                member.Metadata.Records.Clear();
-
-            foreach (var dataKey in MemberDataKeys)
-            {
-                MetadataRecord record = new MetadataRecord() { key = dataKey };
-                record.value = SteamMatchmaking.GetLobbyMemberData(LobbyId, memberId, dataKey);
-                member.Metadata.Records.Add(record);
-            }
-
-            OnMemberDataChanged.Invoke(member);
-
-            return member;
         }
 
         #region Callbacks
@@ -435,7 +271,7 @@ namespace HeathenEngineering.SteamApi.Networking
                     switch (quickMatchFilter.distanceOption)
                     {
                         case ELobbyDistanceFilter.k_ELobbyDistanceFilterClose:
-                            if ((int)MaxDistanceFilter >= 1)
+                            if ((int)maxDistanceFilter >= 1)
                             {
                                 quickMatchFilter.distanceOption = ELobbyDistanceFilter.k_ELobbyDistanceFilterDefault;
                                 FindQuickMatch();
@@ -447,7 +283,7 @@ namespace HeathenEngineering.SteamApi.Networking
                             }
                             break;
                         case ELobbyDistanceFilter.k_ELobbyDistanceFilterDefault:
-                            if ((int)MaxDistanceFilter >= 2)
+                            if ((int)maxDistanceFilter >= 2)
                             {
                                 quickMatchFilter.distanceOption = ELobbyDistanceFilter.k_ELobbyDistanceFilterFar;
                                 FindQuickMatch();
@@ -459,7 +295,7 @@ namespace HeathenEngineering.SteamApi.Networking
                             }
                             break;
                         case ELobbyDistanceFilter.k_ELobbyDistanceFilterFar:
-                            if ((int)MaxDistanceFilter >= 3)
+                            if ((int)maxDistanceFilter >= 3)
                             {
                                 quickMatchFilter.distanceOption = ELobbyDistanceFilter.k_ELobbyDistanceFilterWorldwide;
                                 FindQuickMatch();
@@ -487,22 +323,13 @@ namespace HeathenEngineering.SteamApi.Networking
         private void HandleQuickMatchFailed()
         {
             quickMatchSearch = false;
-            if (quickMatchCreateOnFail)
-            {
-                Debug.Log("Quick Match failed to find a lobby and will create a new one.");
-                CreateLobby(quickMatchFilter, LobbyName, ELobbyType.k_ELobbyTypePublic);
-            }
-            else
-            {
-                Debug.Log("Quick Match failed to find a lobby.");
-                QuickMatchFailed.Invoke();
-            }
+            QuickMatchFailed.Invoke();
         }
 
         private void FindQuickMatch()
         {
             if (!callbacksRegistered)
-                RegisterCallbacks();
+                Initalize();
 
             SetLobbyFilter(quickMatchFilter);
 
@@ -546,7 +373,13 @@ namespace HeathenEngineering.SteamApi.Networking
         #region Callback Handlers
         void HandleLobbyGameCreated(LobbyGameCreated_t param)
         {
-            OnGameServerSet.Invoke(param);
+            var lobby = lobbies.FirstOrDefault(p => p.id.m_SteamID == param.m_ulSteamIDLobby);
+
+            if (lobby != null)
+            {
+                lobby.HandleLobbyGameCreated(param);
+                OnGameServerSet.Invoke(param);
+            }
         }
 
         void HandleLobbyMatchList(LobbyMatchList_t pCallback, bool bIOFailure)
@@ -584,14 +417,16 @@ namespace HeathenEngineering.SteamApi.Networking
 
                     int dataCount = SteamMatchmaking.GetLobbyDataCount(record.lobbyId);
 
-                    if (record.lobbyId == LobbyId)
+                    var matchLobby = lobbies.FirstOrDefault(p => p.id == record.lobbyId);
+
+                    if (matchLobby != null)
                     {
                         Debug.Log("Browsed our own lobby and found " + dataCount.ToString() + " metadata records.");
                     }
 
                     for (int ii = 0; ii < dataCount; ii++)
                     {
-                        bool isUs = (record.lobbyId == LobbyId);
+                        bool isUs = matchLobby != null;
                         string key;
                         string value;
                         if (SteamMatchmaking.GetLobbyDataByIndex(record.lobbyId, ii, out key, Constants.k_nMaxLobbyKeyLength, out value, Constants.k_cubChatMetadataMax))
@@ -606,11 +441,6 @@ namespace HeathenEngineering.SteamApi.Networking
                                 {
                                     record.hostId = new CSteamID(val);
                                 }
-                            }
-
-                            if (isUs)
-                            {
-                                Debug.Log("My Lobby data key = [" + key + "], value = [" + value + "]");
                             }
                         }
                     }
@@ -630,84 +460,12 @@ namespace HeathenEngineering.SteamApi.Networking
             }
         }
 
-        void HandleLobbyChatUpdate(LobbyChatUpdate_t pCallback)
+        void HandleLobbyChatUpdate(LobbyChatUpdate_t param)
         {
-            if (LobbyId.m_SteamID != pCallback.m_ulSteamIDLobby)
-                return;
+            var lobby = lobbies.FirstOrDefault(p => p.id.m_SteamID == param.m_ulSteamIDLobby);
+            lobby.HandleLobbyChatUpdate(param);
 
-            if (pCallback.m_rgfChatMemberStateChange == (uint)EChatMemberStateChange.k_EChatMemberStateChangeLeft)
-            {
-                var memberId = new CSteamID(pCallback.m_ulSteamIDUserChanged);
-                var member = Members.FirstOrDefault(p => p.UserData != null && p.UserData.SteamId == memberId);
-
-                if (RemoveMember(memberId))
-                {
-                    OnOwnershipChange.Invoke(LobbyOwner);
-                    //OnMemberLeft.Invoke(member);
-                }
-                //else
-                //{
-                //    OnMemberLeft.Invoke(member);
-                //}
-                ChatMemberStateChangeLeft.Invoke(SteamworksFoundationManager._GetUserData(memberId));
-            }
-            else if (pCallback.m_rgfChatMemberStateChange == (uint)EChatMemberStateChange.k_EChatMemberStateChangeEntered)
-            {
-                var member = ProcessLobbyMember(new CSteamID(pCallback.m_ulSteamIDUserChanged));
-
-                //OnMemberJoined.Invoke(member);
-                ChatMemberStateChangeEntered.Invoke(member);
-            }
-            else if (pCallback.m_rgfChatMemberStateChange == (uint)EChatMemberStateChange.k_EChatMemberStateChangeDisconnected)
-            {
-                var memberId = new CSteamID(pCallback.m_ulSteamIDUserChanged);
-                var member = Members.FirstOrDefault(p => p.UserData != null && p.UserData.SteamId == memberId);
-
-                if (RemoveMember(memberId))
-                {
-                    OnOwnershipChange.Invoke(LobbyOwner);
-                    //OnMemberLeft.Invoke(member);
-                }
-                //else
-                //{
-                //    OnMemberLeft.Invoke(member);
-                //}
-                ChatMemberStateChangeDisconnected.Invoke(SteamworksFoundationManager._GetUserData(memberId));
-            }
-            else if (pCallback.m_rgfChatMemberStateChange == (uint)EChatMemberStateChange.k_EChatMemberStateChangeKicked)
-            {
-                var memberId = new CSteamID(pCallback.m_ulSteamIDUserChanged);
-                var member = Members.FirstOrDefault(p => p.UserData != null && p.UserData.SteamId == memberId);
-
-                if (RemoveMember(memberId))
-                {
-                    OnOwnershipChange.Invoke(LobbyOwner);
-                    //OnMemberLeft.Invoke(member);
-                }
-                //else
-                //{
-                //    OnMemberLeft.Invoke(member);
-                //}
-                ChatMemberStateChangeKicked.Invoke(SteamworksFoundationManager._GetUserData(memberId));
-            }
-            else if (pCallback.m_rgfChatMemberStateChange == (uint)EChatMemberStateChange.k_EChatMemberStateChangeBanned)
-            {
-                var memberId = new CSteamID(pCallback.m_ulSteamIDUserChanged);
-                var member = Members.FirstOrDefault(p => p.UserData != null && p.UserData.SteamId == memberId);
-
-                if (RemoveMember(memberId))
-                {
-                    OnOwnershipChange.Invoke(LobbyOwner);
-                    //OnMemberLeft.Invoke(member);
-                }
-                //else
-                //{
-                //    OnMemberLeft.Invoke(member);
-                //}
-                ChatMemberStateChangeBanned.Invoke(SteamworksFoundationManager._GetUserData(memberId));
-            }
-
-            OnLobbyChatUpdate.Invoke(pCallback);
+            OnLobbyChatUpdate.Invoke(param);
         }
 
         void HandleGameLobbyJoinRequested(GameLobbyJoinRequested_t param)
@@ -718,248 +476,238 @@ namespace HeathenEngineering.SteamApi.Networking
 
         void HandleLobbyEntered(LobbyEnter_t param)
         {
-            var hostId = SteamMatchmaking.GetLobbyOwner(new CSteamID(param.m_ulSteamIDLobby));
-            var userData = SteamworksFoundationManager.Instance.GetUserName(hostId);
-            Debug.Log("Entered lobby: " + param.m_ulSteamIDLobby.ToString() + " User Name: " + userData + " User Id: " + hostId.m_SteamID);
+            var lobby = lobbies.FirstOrDefault(p => p.id.m_SteamID == param.m_ulSteamIDLobby);
+            if(lobby == null)
+            {
+                lobby = new SteamLobby(new CSteamID(param.m_ulSteamIDLobby));
+                lobby.OnExitLobby.AddListener(HandleExitLobby);
+                lobbies.Add(lobby);
+            }
 
-            SetLobbyId(new CSteamID(param.m_ulSteamIDLobby));
-
-            OnLobbyEnter.Invoke(param);
+            OnLobbyEnter.Invoke(lobby);
         }
 
         void HandleLobbyCreated(LobbyCreated_t param, bool bIOFailure)
         {
-            SetLobbyId(new CSteamID(param.m_ulSteamIDLobby));
-
-            SteamMatchmaking.SetLobbyMemberLimit(LobbyId, MaxMemberCount);
-
-            if (SteamMatchmaking.SetLobbyData(LobbyId, "name", LobbyName))
-                Debug.Log("Set lobby data [name] to [" + LobbyName + "]");
-            else
-                Debug.Log("Failed to set lobby data [name] to [" + LobbyName + "]");
-
-            if (Metadata.Records == null)
+            var lobby = lobbies.FirstOrDefault(p => p.id.m_SteamID == param.m_ulSteamIDLobby);
+            if (lobby == null)
             {
-                Metadata.Records = new List<MetadataRecord>();
+                lobby = new SteamLobby(new CSteamID(param.m_ulSteamIDLobby));
+                lobby.OnExitLobby.AddListener(HandleExitLobby);
+                lobbies.Add(lobby);
             }
-            else
-            {
-                Metadata.Records.Clear();
-            }
-
-            if (createLobbyFilter.stringValues != null)
-            {
-                foreach (var f in createLobbyFilter.stringValues)
-                {
-                    if (SteamMatchmaking.SetLobbyData(LobbyId, f.key, f.value))
-                    {
-                        Metadata[f.key] = f.value;
-                        Debug.Log("Set lobby data [" + f.key + "] to [" + f.value + "]");
-                    }
-                    else
-                        Debug.Log("Failed to set lobby data [" + f.key + "] to [" + f.value + "]");
-                }
-            }
-
-            if (createLobbyFilter.numberValues != null)
-            {
-                foreach (var f in createLobbyFilter.numberValues)
-                {
-                    if (SteamMatchmaking.SetLobbyData(LobbyId, f.key, f.value.ToString()))
-                    {
-                        Metadata[f.key] = f.value.ToString();
-                        Debug.Log("Set lobby data [" + f.key + "] to [" + f.value.ToString() + "]");
-                    }
-                    else
-                        Debug.Log("Failed to set lobby data [" + f.key + "] to [" + f.value.ToString() + "]");
-                }
-            }
-
-            var ownerData = new SteamworksLobbyMember()
-            {
-                Metadata = new SteamworksLobbyMetadata(),
-                UserData = SteamworksFoundationManager._UserData,
-            };
-
-            LobbyOwner = ownerData;
-
-            //Remove any existing member entry for the owner other than the one we created now
-            Members.RemoveAll(p => p.UserData.SteamId == ownerData.UserData.SteamId);
-            Members.Add(ownerData);
 
             OnLobbyCreated.Invoke(param);
         }
 
         void HandleLobbyDataUpdate(LobbyDataUpdate_t param)
         {
-            var askedToLeave = false;
-
-            if(param.m_bSuccess == 0)
-            {
-                LobbyDataUpdateFailed.Invoke();
-                return;
-            }
-
-            if (param.m_ulSteamIDLobby == param.m_ulSteamIDMember)
-            {
-                var count = SteamMatchmaking.GetLobbyDataCount(LobbyId);
-                var key = "";
-                var value = "";
-                for (int i = 0; i < count; i++)
-                {
-                    if (SteamMatchmaking.GetLobbyDataByIndex(LobbyId, i, out key, Constants.k_nMaxLobbyKeyLength, out value, Constants.k_cubChatMetadataMax))
-                    {
-                        if (key == "name")
-                            LobbyName = value;
-                        if(key == "z_heathenKick")
-                        {
-                            if(value != null && value.Contains("[" + SteamUser.GetSteamID().m_SteamID.ToString() + "]"))
-                            {
-                                //We have been asked to leave
-                                Debug.Log("User has been kicked from the lobby.");
-                                askedToLeave = true;
-                            }
-                        }
-
-                        Metadata[key] = value;
-                    }
-                }
-                OnLobbyDataChanged.Invoke();
-            }
-            else
-            {
-                ProcessLobbyMember(new CSteamID(param.m_ulSteamIDMember));
-            }
-
-            if (askedToLeave)
-            {
-                LeaveLobby();
-                OnKickedFromLobby.Invoke();
-            }
-            else
-            {
-                var steamHost = SteamMatchmaking.GetLobbyOwner(LobbyId);
-                if (steamHost.m_SteamID != LobbyOwner.UserData.SteamId.m_SteamID)
-                {
-                    //Host changed
-                    var memberInfo = Members.FirstOrDefault(p => p.UserData.SteamId.m_SteamID == steamHost.m_SteamID);
-
-                    if (memberInfo != null)
-                    {
-                        LobbyOwner = memberInfo;
-                        OnOwnershipChange.Invoke(LobbyOwner);
-                    }
-                }
-            }
+            var lobby = lobbies.FirstOrDefault(p => p.id.m_SteamID == param.m_ulSteamIDLobby);
+            lobby.HandleLobbyDataUpdate(param);
         }
 
-        void HandleLobbyChatMessage(LobbyChatMsg_t pCallback)
+        void HandleLobbyChatMessage(LobbyChatMsg_t param)
         {
-            var subjectLobby = (CSteamID)pCallback.m_ulSteamIDLobby;
-            if (subjectLobby != LobbyId)
-                return;
+            var lobby = lobbies.FirstOrDefault(p => p.id.m_SteamID == param.m_ulSteamIDLobby);
+            var message = lobby.HandleLobbyChatMessage(param);
 
-            CSteamID SteamIDUser;
-            byte[] Data = new byte[4096];
-            EChatEntryType ChatEntryType;
-            int ret = SteamMatchmaking.GetLobbyChatEntry(subjectLobby, (int)pCallback.m_iChatID, out SteamIDUser, Data, Data.Length, out ChatEntryType);
-            byte[] truncated = new byte[ret];
-            Array.Copy(Data, truncated, ret);
+            if (message != null)
+                OnChatMessageReceived.Invoke(message);
+        }
 
-            LobbyChatMessageData record = new LobbyChatMessageData();
-            record.sender = Members.FirstOrDefault(p => p.UserData.SteamId == SteamIDUser);
-            record.message = System.Text.Encoding.UTF8.GetString(truncated);
-            record.recievedTime = DateTime.Now;
-            record.chatEntryType = ChatEntryType;
+        void HandleExitLobby(SteamLobby lobby)
+        {
+            lobbies.RemoveAll(p => p.id == lobby.id);
+            OnLobbyExit.Invoke(lobby);
+        }
+        #endregion
 
-            OnChatMessageReceived.Invoke(record);
+        #region Deprecated Members
+
+        /// <summary>
+        /// Depricated event.
+        /// </summary>
+        /// <remarks>
+        /// OnLobbyDataChanged member is no longer used at the settings level, please use SteamLobby.OnLobbyDataChanged e.g. lobbySettings.lobbies[0].OnLobbyDataChanged
+        /// </remarks>
+        [Obsolete("OnLobbyDataChanged member is no longer used at the settings level, please use SteamLobby.OnLobbyDataChanged e.g. lobbySettings.lobbies[0].OnLobbyDataChanged", true)]
+        [HideInInspector]
+        public UnityEvent OnLobbyDataChanged { get; }
+
+        /// <summary>
+        /// Depricated event.
+        /// </summary>
+        /// <remarks>
+        /// OnOwnershipChange member is no longer used at the settings level, please use SteamLobby.OnOwnershipChange e.g. lobbySettings.lobbies[0].OnOwnershipChange
+        /// </remarks>
+        [Obsolete("OnOwnershipChange member is no longer used at the settings level, please use SteamLobby.OnOwnershipChange e.g. lobbySettings.lobbies[0].OnOwnershipChange", true)]
+        [HideInInspector]
+        public SteamworksLobbyMemberEvent OnOwnershipChange { get; }
+
+        /// <summary>
+        /// Depricated event.
+        /// </summary>
+        /// <remarks>
+        /// OnMemberJoined member is no longer used at the settings level, please use SteamLobby.OnMemberJoined e.g. lobbySettings.lobbies[0].OnMemberJoined
+        /// </remarks>
+        [Obsolete("OnMemberJoined member is no longer used at the settings level, please use SteamLobby.OnMemberJoined e.g. lobbySettings.lobbies[0].OnMemberJoined", true)]
+        [HideInInspector]
+        public SteamworksLobbyMemberEvent OnMemberJoined { get; }
+
+        /// <summary>
+        /// Depricated event.
+        /// </summary>
+        /// <remarks>
+        /// OnMemberLeft member is no longer used at the settings level, please use SteamLobby.OnMemberLeft e.g. lobbySettings.lobbies[0].OnMemberLeft
+        /// </remarks>
+        [Obsolete("OnMemberLeft member is no longer used at the settings level, please use SteamLobby.OnMemberLeft e.g. lobbySettings.lobbies[0].OnMemberLeft", true)]
+        [HideInInspector]
+        public SteamworksLobbyMemberEvent OnMemberLeft { get; }
+
+        /// <summary>
+        /// Depricated event.
+        /// </summary>
+        /// <remarks>
+        /// OnMemberDataChanged member is no longer used at the settings level, please use SteamLobby.OnMemberDataChanged e.g. lobbySettings.lobbies[0].OnMemberDataChanged
+        /// </remarks>
+        [Obsolete("OnMemberDataChanged member is no longer used at the settings level, please use SteamLobby.OnMemberDataChanged e.g. lobbySettings.lobbies[0].OnMemberDataChanged", true)]
+        [HideInInspector]
+        public SteamworksLobbyMemberEvent OnMemberDataChanged { get; }
+
+        /// <summary>
+        /// Depricated event.
+        /// </summary>
+        /// <remarks>
+        /// LobbyDataUpdateFailed member is no longer used at the settings level, please use SteamLobby.LobbyDataUpdateFailed e.g. lobbySettings.lobbies[0].LobbyDataUpdateFailed
+        /// </remarks>
+        [Obsolete("LobbyDataUpdateFailed member is no longer used at the settings level, please use SteamLobby.LobbyDataUpdateFailed e.g. lobbySettings.lobbies[0].LobbyDataUpdateFailed", true)]
+        [HideInInspector]
+        public UnityEvent LobbyDataUpdateFailed { get; }
+
+        /// <summary>
+        /// Depricated event.
+        /// </summary>
+        /// <remarks>
+        /// OnKickedFromLobby member is no longer used at the settings level, please use SteamLobby.OnKickedFromLobby e.g. lobbySettings.lobbies[0].OnKickedFromLobby
+        /// </remarks>
+        [Obsolete("OnKickedFromLobby member is no longer used at the settings level, please use SteamLobby.OnKickedFromLobby e.g. lobbySettings.lobbies[0].OnKickedFromLobby", true)]
+        [HideInInspector]
+        public UnityEvent OnKickedFromLobby { get; }
+
+        /// <summary>
+        /// Depricated is host member.
+        /// This will always be false and should throw an exception if called in code.
+        /// </summary>
+        /// <remarks>
+        /// You can check if the local user is the host of any specific lobby by calling that lobby's IsHost member e.g. lobbySettings.lobbies[0].IsHost
+        /// </remarks>
+        [Obsolete("IsHost member is no longer used, please use SteamLobby.IsHost e.g. lobbySettings.lobbies[0].IsHost", true)]
+        public bool IsHost { get; }
+
+        /// <summary>
+        /// Depricated has game server member.
+        /// This will always be false and should throw an exception if called in code.
+        /// </summary>
+        /// <remarks>
+        /// You can check if the has game server on any specific lobby by calling that lobby's HasGameServer member e.g. lobbySettings.lobbies[0].HasGameServer
+        /// </remarks>
+        [Obsolete("HasGameServer member is no longer used, please use SteamLobby.HasGameServer e.g. lobbySettings.lobbies[0].HasGameServer", true)]
+        public bool HasGameServer { get; }
+
+        /// <summary>
+        /// Depricated Game Server Information member.
+        /// This will always be false and should throw an exception if called in code.
+        /// </summary>
+        /// <remarks>
+        /// You can check if the has game server on any specific lobby by calling that lobby's GameServer member e.g. lobbySettings.lobbies[0].GameServer
+        /// </remarks>
+        [Obsolete("GameServerInformation member is no longer used, please use SteamLobby.GameServer e.g. lobbySettings.lobbies[0].GameServer", true)]
+        public LobbyGameServerInformation GameServerInformation { get; }
+
+
+        /// <summary>
+        /// Depricated metadata member.
+        /// This will be null and should throw an exception if called in code.
+        /// </summary>
+        /// <remarks>
+        /// You can use the string Indexer on SteamLobby to access that Lobbies metadata e.g. 
+        /// <code>myLobby["metadataKey"] = "This sets the value of metadataKey";</code>
+        /// 
+        /// </remarks>
+        [Obsolete("Metadata member is no longer used on the settings object, please use SteamLobby[string metadataKey] to access a specific metadata field or use SteamLobby.GetMetadataEntries() to return an array of KeyValuePair<string key, string value> representing each field that can be iterated over such as in a foreach loop.", true)]
+        public SteamworksLobbyMetadata Metadata { get; }
+
+        /// <summary>
+        /// Depricated create lobby command.
+        /// This will throw an exception if called and its use will appear as an error in your compiler.
+        /// </summary>
+        /// <param name="lobbyFilter"></param>
+        /// <param name="lobbyName"></param>
+        /// <param name="lobbyType"></param>
+        [Obsolete("CreateLobby(LobbyHunterFilter lobbyFilter, string lobbyName, ELobbyType lobbyType) is deprecated, please use CreateLobby(ELobbyType lobbyType, int memberCountLimit) instead.", true)]
+        public void CreateLobby(LobbyHunterFilter lobbyFilter, string lobbyName, ELobbyType lobbyType)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Depricated leve lobby command.
+        /// This will throw an exception if called and its use will appear as an error in your compiler.
+        /// </summary>
+        [Obsolete("LeaveLobby is deprecated, please use the Leave method available on the SteamLobby object to leave a specific lobby, e.g. LobbySettings.lobbies[LobbyId].Leave();", true)]
+        public void LeaveLobby()
+        {
+            throw new NotImplementedException();
         }
         #endregion
 
         /// <summary>
-        /// Creates a new lobby according the LobbyFilter information provided
+        /// Creates a new empty (without metadata) lobby. The user will be added to the lobby on creation
         /// </summary>
-        /// <param name="LobbyFilter">Defines the base metadata in the form of a search filter</param>
-        /// <param name="LobbyName">The name to be applied to the lobby, all Heathen lobbies define a lobby name if none is passed the current users display name will be used</param>
         /// <param name="lobbyType">The type of lobby to be created ... see Valve's documentation regarding ELobbyType for more informaiton</param>
-        public void CreateLobby(LobbyHunterFilter LobbyFilter, string LobbyName = "", ELobbyType lobbyType = ELobbyType.k_ELobbyTypePublic)
+        /// <param name="memberCountLimit">The limit on the number of users that can join this lobby</param>
+        public void CreateLobby(ELobbyType lobbyType, int memberCountLimit)
         {
-            if (LobbyName == "")
-                LobbyName = SteamworksFoundationManager.Instance.Settings.UserData.DisplayName;
-            else
-                this.LobbyName = LobbyName;
-
-            createLobbyFilter = LobbyFilter;
-
-            var call = SteamMatchmaking.CreateLobby(lobbyType, MaxMemberCount);
+            var call = SteamMatchmaking.CreateLobby(lobbyType, memberCountLimit);
             m_LobbyCreated.Set(call, HandleLobbyCreated);
         }
 
         /// <summary>
         /// Joins a steam lobby
-        /// Note this will leave any current lobby before joining the new lobby
         /// </summary>
         /// <param name="lobbyId">The ID of the lobby to join</param>
+        /// <remarks>
+        /// See <see href="https://partner.steamgames.com/doc/api/ISteamMatchmaking#JoinLobby">JoinLobby</see> in Valve's documentation for more details.
+        /// </remarks>
         public void JoinLobby(CSteamID lobbyId)
         {
-            
-
-            if (LobbyId == lobbyId)
-            {
-                Debug.Log("Already in this lobby");
-                return;
-            }
-
-            if (LobbyId != CSteamID.Nil)
-                SteamMatchmaking.LeaveLobby(LobbyId);
-
-            LobbyId = CSteamID.Nil;
-
             SteamMatchmaking.JoinLobby(lobbyId);
-            Debug.Log("Joined lobby: " + lobbyId.ToString());
         }
 
         /// <summary>
         /// Joins a steam lobby
-        /// Note this will leave any current lobby before joining the new lobby
         /// </summary>
         /// <param name="lobbyId">The ID of the lobby to join</param>
+        /// <remarks>
+        /// See <see href="https://partner.steamgames.com/doc/api/ISteamMatchmaking#JoinLobby">JoinLobby</see> in Valve's documentation for more details.
+        /// </remarks>
         public void JoinLobby(ulong lobbyId)
         {
-            if (LobbyId == new CSteamID(lobbyId))
-                return;
-
-            if (LobbyId != CSteamID.Nil)
-                SteamMatchmaking.LeaveLobby(LobbyId);
-
-            LobbyId = CSteamID.Nil;
-
             SteamMatchmaking.JoinLobby(new CSteamID(lobbyId));
         }
 
         /// <summary>
         /// Leaves the current lobby if any
         /// </summary>
-        public void LeaveLobby()
+        public void LeaveAllLobbies()
         {
-            var result = false;
-            if (InLobby)
-                result = true;
+            var tempList = lobbies.ToArray();
 
-            try
-            {
-                SteamMatchmaking.LeaveLobby(LobbyId);
-            }
-            catch { }
-            LobbyId = CSteamID.Nil;
-            LobbyOwner = null;
-            Members = new List<SteamworksLobbyMember>();
-            Metadata = new SteamworksLobbyMetadata();
+            foreach (var lobby in tempList)
+                lobby.Leave();
 
-            OnLobbyExit.Invoke();
-
-            if (result)
-                OnLobbyExit.Invoke();
+            lobbies.Clear();
+            tempList = null;
         }
 
         /// <summary>
@@ -994,15 +742,13 @@ namespace HeathenEngineering.SteamApi.Networking
         public bool QuickMatch(LobbyHunterFilter LobbyFilter, string onCreateName, bool autoCreate = false)
         {
             if (!callbacksRegistered)
-                RegisterCallbacks();
+                Initalize();
 
             if (quickMatchSearch || standardSearch)
             {
                 return false;
             }
 
-            LobbyName = onCreateName;
-            quickMatchCreateOnFail = autoCreate;
             quickMatchSearch = true;
             quickMatchFilter = LobbyFilter;
             quickMatchFilter.distanceOption = ELobbyDistanceFilter.k_ELobbyDistanceFilterClose;
@@ -1019,7 +765,7 @@ namespace HeathenEngineering.SteamApi.Networking
         public void CancelQuickMatch()
         {
             if (!callbacksRegistered)
-                RegisterCallbacks();
+                Initalize();
 
             if (quickMatchSearch)
             {
@@ -1035,7 +781,7 @@ namespace HeathenEngineering.SteamApi.Networking
         public void CancelStandardSearch()
         {
             if (!callbacksRegistered)
-                RegisterCallbacks();
+                Initalize();
 
             if (standardSearch)
             {
@@ -1045,74 +791,125 @@ namespace HeathenEngineering.SteamApi.Networking
         }
 
         /// <summary>
-        /// Sends a chat message via Valve's Lobby Chat system
+        /// Sends a chat message via Valve's Lobby Chat system to the first lobby in the <see cref="lobbies"/> list
         /// </summary>
         /// <param name="message">The message to send</param>
+        /// <remarks>
+        /// <para>
+        /// This method exists here for support of older single lobby systems. It is recomended that you use the SendChatMessage on the specific lobby you want to send a message on or that you use the overload that takes the lobby ID.
+        /// </para>
+        /// </remarks>
         public void SendChatMessage(string message)
         {
+            if (lobbies.Count == 0)
+                return;
+
             if (!callbacksRegistered)
-                RegisterCallbacks();
+                Initalize();
 
             byte[] MsgBody = System.Text.Encoding.UTF8.GetBytes(message);
-            SteamMatchmaking.SendLobbyChatMsg(LobbyId, MsgBody, MsgBody.Length);
+            SteamMatchmaking.SendLobbyChatMsg(lobbies[0].id, MsgBody, MsgBody.Length);
         }
 
         /// <summary>
-        /// Sets metadata on the lobby, this can only be called by the host of the lobby
+        /// Send a chat message to the indicated lobby
+        /// </summary>
+        /// <param name="lobbyId">The lobby to chat on</param>
+        /// <param name="message">The message to be sent</param>
+        public void SendChatMessage(CSteamID lobbyId, string message)
+        {
+            if (lobbies.Count == 0)
+                return;
+
+            if (!callbacksRegistered)
+                Initalize();
+
+            byte[] MsgBody = System.Text.Encoding.UTF8.GetBytes(message);
+            SteamMatchmaking.SendLobbyChatMsg(lobbyId, MsgBody, MsgBody.Length);
+        }
+
+        /// <summary>
+        /// Sets metadata on the first lobby, this can only be called by the host of the lobby
         /// </summary>
         /// <param name="key">The key of the metadata to set</param>
         /// <param name="value">The value of the metadata to set</param>
+        /// <remarks>
+        /// <para>
+        /// This is here to support older single lobby code, it is recomended that you set data directly on the <see cref="SteamLobby"/> object or use the overload to specify the lobby you want to target.
+        /// </para>
+        /// </remarks>
         public void SetLobbyMetadata(string key, string value)
         {
-            if (!callbacksRegistered)
-                RegisterCallbacks();
-
-            if (!IsHost)
+            if (lobbies.Count == 0)
                 return;
 
-            if (key == "name")
-                LobbyName = value;
+            if (!callbacksRegistered)
+                Initalize();
 
-            Metadata[key] = value;
-            SteamMatchmaking.SetLobbyData(LobbyId, key, value);
+            lobbies[0][key] = value;
         }
 
         /// <summary>
-        /// Sets metadata for the player on the lobby
+        /// Sets metadata on the first lobby, this can only be called by the host of the lobby
+        /// </summary>
+        /// <param name="key">The key of the metadata to set</param>
+        /// <param name="value">The value of the metadata to set</param>
+        public void SetLobbyMetadata(CSteamID lobbyId, string key, string value)
+        {
+            if (!callbacksRegistered)
+                Initalize();
+
+            this[lobbyId][key] = value;
+        }
+
+        /// <summary>
+        /// Sets metadata for the player on the first lobby
         /// </summary>
         /// <param name="key">The key of the metadata to set</param>
         /// <param name="value">The value of the metadata to set</param>
         public void SetMemberMetadata(string key, string value)
         {
+            if (lobbies.Count == 0)
+                return;
+
             if (!callbacksRegistered)
-                RegisterCallbacks();
+                Initalize();
 
-            if (MemberDataKeys == null)
-                MemberDataKeys = new List<string>();
+            lobbies[0].User[key] = value;
+        }
 
-            if (!MemberDataKeys.Contains(key))
-                MemberDataKeys.Add(key);
+        /// <summary>
+        /// Sets metadata for the player on the first lobby
+        /// </summary>
+        /// <param name="key">The key of the metadata to set</param>
+        /// <param name="value">The value of the metadata to set</param>
+        public void SetMemberMetadata(CSteamID lobbyId, string key, string value)
+        {
+            if (!callbacksRegistered)
+                Initalize();
 
-            //Fetch this users member entry
-            var memberEntry = Members.FirstOrDefault(p => p.UserData != null && p.UserData.SteamId == SteamworksFoundationManager._UserData.SteamId);
+            this[lobbyId].User[key] = value;
+        }
 
-            //If no entry found create one
-            if (memberEntry == null)
-            {
-                memberEntry = new SteamworksLobbyMember()
-                {
-                    Metadata = new SteamworksLobbyMetadata(),
-                    UserData = SteamworksFoundationManager._UserData,
-                };
+        /// <summary>
+        /// Sets the lobby game server e.g. game start using the lobby Host as the server ID
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// This assumes you want to set the game server on the first lobby. It exists to support older code that used a single lobby system.
+        /// It is recomended that you call <see cref="SteamLobby.SetGameServer"/> directly on the lobby you want or use the overload to indicate the lobby.
+        /// </para>
+        /// <para>
+        /// This will trigger GameServerSet on all members of the lobby
+        /// This should be called after the server is started
+        /// </para>
+        /// </remarks>
+        public void SetLobbyGameServer()
+        {
+            if (!callbacksRegistered)
+                Initalize();
 
-                Members.Add(memberEntry);
-            }
-
-            //Add the entry locally
-            memberEntry.Metadata[key] = value;
-
-            //Add the entry on the server
-            SteamMatchmaking.SetLobbyMemberData(LobbyId, key, value);
+            lobbies[0].SetGameServer();
         }
 
         /// <summary>
@@ -1124,55 +921,12 @@ namespace HeathenEngineering.SteamApi.Networking
         /// This should be called after the server is started
         /// </para>
         /// </remarks>
-        public void SetLobbyGameServer()
+        public void SetLobbyGameServer(CSteamID lobbyId)
         {
             if (!callbacksRegistered)
-                RegisterCallbacks();
+                Initalize();
 
-            Debug.Log("Calling Set Lobby Game Server for P2P with a host of '" + LobbyOwner.UserData.DisplayName + "' with CSteamID of [" + LobbyOwner.UserData.SteamId.m_SteamID.ToString() + "]");
-
-            SteamMatchmaking.SetLobbyGameServer(LobbyId, 0, 0, LobbyOwner.UserData.SteamId);
-        }
-
-        /// <summary>
-        /// Sets the lobby game server e.g. game start 
-        /// </summary>
-        /// <param name="gameServerId">The CSteamID of the steam game server</param>
-        /// <remarks>
-        /// <para>
-        /// This will trigger GameServerSet on all members of the lobby
-        /// This should be called after the server is started
-        /// </para>
-        /// </remarks>
-        public void SetLobbyGameServer(CSteamID gameServerId)
-        {
-            if (!callbacksRegistered)
-                RegisterCallbacks();
-
-            Debug.Log("Calling Set Lobby Game Server with a server ID of [" + gameServerId.m_SteamID.ToString() + "]");
-
-            SteamMatchmaking.SetLobbyGameServer(LobbyId, 0, 0, gameServerId);
-        }
-
-        /// <summary>
-        /// Sets the lobby game server e.g. game start
-        /// </summary>
-        /// <param name="ipAddress">The ip address of the server</param>
-        /// <param name="port">The port to be used to connect to the server</param>
-        /// <remarks>
-        /// <para>
-        /// This will trigger GameServerSet on all members of the lobby
-        /// This should be called after the server is started
-        /// </para>
-        /// </remarks>
-        public void SetLobbyGameServer(uint ipAddress, ushort port)
-        {
-            if (!callbacksRegistered)
-                RegisterCallbacks();
-
-            Debug.Log("Calling Set Lobby Game Server with a server IP Address [" + SteamUtilities.IPUintToString(ipAddress) + "] + Port [" + port.ToString() + "]");
-
-            SteamMatchmaking.SetLobbyGameServer(LobbyId, ipAddress, port, CSteamID.Nil);
+            this[lobbyId].SetGameServer();
         }
 
         /// <summary>
@@ -1183,43 +937,9 @@ namespace HeathenEngineering.SteamApi.Networking
         /// <param name="serverId"></param>
         /// <remarks>
         /// <para>
-        /// This will trigger GameServerSet on all members of the lobby
-        /// This should be called after the server is started
+        /// This assumes you want to set the game server on the first lobby. It exists to support older code that used a single lobby system.
+        /// It is recomended that you call <see cref="SteamLobby.SetGameServer"/> directly on the lobby you want or use the overload to indicate the lobby.
         /// </para>
-        /// </remarks>
-        public void SetLobbyGameServer(uint ipAddress, ushort port, CSteamID serverId)
-        {
-            if (!callbacksRegistered)
-                RegisterCallbacks();
-
-            Debug.Log("Calling Set Lobby Game Server with a server IP Address [" + SteamUtilities.IPUintToString(ipAddress) + "] + Port [" + port.ToString() + "] + Server ID [" + serverId.m_SteamID.ToString() + "]");
-
-            SteamMatchmaking.SetLobbyGameServer(LobbyId, ipAddress, port, serverId);
-        }
-
-        /// <summary>
-        /// Sets the lobby game server e.g. game start
-        /// </summary>
-        /// <param name="ipAddress">The ip address of the server</param>
-        /// <param name="port">The port to be used to connect to the server</param>
-        /// <remarks>
-        /// <para>
-        /// This will trigger GameServerSet on all members of the lobby
-        /// This should be called after the server is started
-        /// </para>
-        /// </remarks>
-        public void SetLobbyGameServer(string ipAddress, ushort port)
-        {
-            SetLobbyGameServer(SteamUtilities.IPStringToUint(ipAddress), port);
-        }
-
-        /// <summary>
-        /// Sets the lobby game server e.g. game start
-        /// </summary>
-        /// <param name="ipAddress"></param>
-        /// <param name="port"></param>
-        /// <param name="serverId"></param>
-        /// <remarks>
         /// <para>
         /// This will trigger GameServerSet on all members of the lobby
         /// This should be called after the server is started
@@ -1227,75 +947,96 @@ namespace HeathenEngineering.SteamApi.Networking
         /// </remarks>
         public void SetLobbyGameServer(string ipAddress, ushort port, CSteamID serverId)
         {
-            SetLobbyGameServer(SteamUtilities.IPStringToUint(ipAddress), port, serverId);
+            lobbies[0].SetGameServer(ipAddress, port, serverId);
+        }
+
+        /// <summary>
+        /// Sets the lobby game server e.g. game start
+        /// </summary>
+        /// <param name="ipAddress"></param>
+        /// <param name="port"></param>
+        /// <param name="serverId"></param>
+        /// <remarks>
+        /// <para>
+        /// This will trigger GameServerSet on all members of the lobby
+        /// This should be called after the server is started
+        /// </para>
+        /// </remarks>
+        public void SetLobbyGameServer(CSteamID lobbyId, string ipAddress, ushort port, CSteamID serverId)
+        {
+            this[lobbyId].SetGameServer(ipAddress, port, serverId);
         }
 
         /// <summary>
         /// Sets the lobby as joinable or not. The default is that a lobby is joinable.
         /// </summary>
         /// <param name="value"></param>
+        /// <remarks>
+        /// <para>
+        /// This assumes you want to set the game server on the first lobby. It exists to support older code that used a single lobby system.
+        /// It is recomended that you call <see cref="SteamLobby.Joinable"/> directly on the lobby you want or use the overload to indicate the lobby.
+        /// </para>
+        /// </remarks>
         public void SetLobbyJoinable(bool value)
         {
-            SteamMatchmaking.SetLobbyJoinable(lobbyId, value);
+            lobbies[0].Joinable = value;
         }
 
         /// <summary>
-        /// Gets the game server information from the Valve backend for the tracked lobby
+        /// Sets the lobby as joinable or not. The default is that a lobby is joinable.
         /// </summary>
-        /// <param name="address">
+        /// <param name="value"></param>
+        /// <remarks>
         /// <para>
-        /// Valve style uint packed IP address where the first octive is packed in the left most 8 bits and the last octive is packed in the right most 8 bits.
-        /// You can use <see cref="SteamUtilities.IPUintToString(uint)"/> to convert from a packed address and <see cref="SteamUtilities.IPStringToUint(string)"/> to pack a string based address.
+        /// This assumes you want to set the game server on the first lobby. It exists to support older code that used a single lobby system.
+        /// It is recomended that you call <see cref="SteamLobby.Joinable"/> directly on the lobby you want or use the overload to indicate the lobby.
         /// </para>
-        /// </param>
-        /// <param name="port"></param>
-        /// <param name="serverId"></param>
-        /// <returns></returns>
-        public bool GetLobbyGameServer_ValveStyle(out uint address, out ushort port, out CSteamID serverId)
+        /// </remarks>
+        public void SetLobbyJoinable(CSteamID lobbyId, bool value)
         {
-            return SteamMatchmaking.GetLobbyGameServer(LobbyId, out address, out port, out serverId);
+            this[lobbyId].Joinable = value;
         }
 
         /// <summary>
-        /// Gets the game server information from the Valve backend for the tracked lobby
+        /// Returns information about the lobbies game server
         /// </summary>
-        /// <param name="address">A string based IP address as is expected by Mirror and similar high level interfaces</param>
-        /// <param name="port"></param>
-        /// <param name="serverId"></param>
         /// <returns></returns>
-        public bool GetLobbyGameServer_MirrorStyle(out string address, out ushort port, out CSteamID serverId)
+        /// <remarks>
+        /// <para>
+        /// This assumes you want to set the game server on the first lobby. It exists to support older code that used a single lobby system.
+        /// It is recomended that you call <see cref="SteamLobby.GameServer"/> directly on the lobby you want or use the overload to indicate the lobby.
+        /// </para>
+        /// </remarks>
+        public LobbyGameServerInformation GetGameServer()
         {
-            uint ipAddress;
-            address = string.Empty;
-            var result = SteamMatchmaking.GetLobbyGameServer(LobbyId, out ipAddress, out port, out serverId);
-            if(result)
-            {
-                address = SteamUtilities.IPUintToString(ipAddress);
-            }
-
-            return result;
+            return lobbies[0].GameServer;
         }
 
         /// <summary>
-        /// Gets the game server information from the Valve backend for the tracked lobby
+        /// Returns information about the lobbies game server
         /// </summary>
-        /// <param name="serverInformation">A sructure containing both the Valve and Mirror style addressing information as well as CSteamID information</param>
+        /// <param name="lobbyId"></param>
         /// <returns></returns>
-        public bool GetLobbyGameServer_HeathenStyle(out LobbyGameServerInformation serverInformation)
+        public LobbyGameServerInformation GetGameServer(CSteamID lobbyId)
         {
-            uint ipAddress;
-            ushort port;
-            CSteamID serverId;
-            var result = SteamMatchmaking.GetLobbyGameServer(LobbyId, out ipAddress, out port, out serverId);
+            return this[lobbyId].GameServer;
+        }
 
-            serverInformation = new LobbyGameServerInformation()
-            {
-                ipAddress = ipAddress,
-                port = port,
-                serverId = serverId
-            };
-
-            return result;
+        /// <summary>
+        /// Marks the user to be removed
+        /// </summary>
+        /// <param name="memberId"></param>
+        /// <remarks>
+        /// <para>
+        /// This assumes you want to set the game server on the first lobby. It exists to support older code that used a single lobby system.
+        /// It is recomended that you call <see cref="SteamLobby.GameServer"/> directly on the lobby you want or use the overload to indicate the lobby.
+        /// </para>
+        /// This creates an entry in the metadata named z_heathenKick which contains a string array of Ids of users that should leave the lobby.
+        /// When users detect their ID in the string they will automatically leave the lobby on leaving the lobby the users ID will be removed from the array.
+        /// </remarks>
+        public void KickMember(CSteamID memberId)
+        {
+            lobbies[0].KickMember(memberId);
         }
 
         /// <summary>
@@ -1306,61 +1047,9 @@ namespace HeathenEngineering.SteamApi.Networking
         /// This creates an entry in the metadata named z_heathenKick which contains a string array of Ids of users that should leave the lobby.
         /// When users detect their ID in the string they will automatically leave the lobby on leaving the lobby the users ID will be removed from the array.
         /// </remarks>
-        public void KickMember(CSteamID memberId)
+        public void KickMember(CSteamID lobbyId, CSteamID memberId)
         {
-            if (!IsHost)
-            {
-                Debug.LogError("Only the host of a lobby can kick a member from it.");
-                return;
-            }
-
-            if(memberId.m_SteamID == SteamUser.GetSteamID().m_SteamID)
-            {
-                Debug.Log("Host is kicking its self out");
-                LeaveLobby();
-                OnKickedFromLobby.Invoke();
-                return;
-            }
-            else
-            {
-                Debug.Log("Marking " + memberId.m_SteamID + " for removal");
-            }
-
-            var kickList = Metadata["z_heathenKick"];
-
-            if (kickList == null)
-                kickList = string.Empty;
-
-            if (!kickList.Contains("[" + memberId.ToString() + "]"))
-                kickList += "[" + memberId.ToString() + "]";
-
-            SetLobbyMetadata("z_heathenKick", kickList);
-        }
-
-        /// <summary>
-        /// Marks the user to be removed
-        /// </summary>
-        /// <param name="member"></param>
-        /// <remarks>
-        /// This creates an entry in the metadata named z_heathenKick which contains a string array of Ids of users that should leave the lobby.
-        /// When users detect their ID in the string they will automatically leave the lobby on leaving the lobby the users ID will be removed from the array.
-        /// </remarks>
-        public void KickMember(SteamUserData member)
-        {
-            KickMember(member.SteamId);
-        }
-
-        /// <summary>
-        /// Marks the user to be removed
-        /// </summary>
-        /// <param name="memberIndex"></param>
-        /// <remarks>
-        /// This creates an entry in the metadata named z_heathenKick which contains a string array of Ids of users that should leave the lobby.
-        /// When users detect their ID in the string they will automatically leave the lobby on leaving the lobby the users ID will be removed from the array.
-        /// </remarks>
-        public void KickMember(int memberIndex)
-        {
-            KickMember(Members[memberIndex].UserData.SteamId);
+            this[lobbyId].KickMember(memberId);
         }
 
         /// <summary>
@@ -1368,18 +1057,17 @@ namespace HeathenEngineering.SteamApi.Networking
         /// </summary>
         /// <param name="newOwner"></param>
         /// <remarks>
+        /// <para>
+        /// This assumes you want to set the game server on the first lobby. It exists to support older code that used a single lobby system.
+        /// It is recomended that you call <see cref="SteamLobby.OwnerId"/> directly on the lobby you want or use the overload to indicate the lobby.
+        /// </para>
         /// <para>
         /// This does not effect the NetworkManager or other networking funcitonality it only changes the ownership of a lobby
         /// </para>
         /// </remarks>
         public void ChangeOwner(CSteamID newOwner)
         {
-            if (IsHost && SteamUser.GetSteamID().m_SteamID != newOwner.m_SteamID)
-                SteamMatchmaking.SetLobbyOwner(LobbyId, newOwner);
-            else
-            {
-                Debug.LogWarning("Only the host of the lobby can request change of ownership and cannot change ownership to its self.");
-            }
+            lobbies[0].OwnerId = newOwner;
         }
 
         /// <summary>
@@ -1391,36 +1079,11 @@ namespace HeathenEngineering.SteamApi.Networking
         /// This does not effect the NetworkManager or other networking funcitonality it only changes the ownership of a lobby
         /// </para>
         /// </remarks>
-        public void ChangeOwner(SteamUserData newOwner)
+        public void ChangeOwner(CSteamID lobbyId, CSteamID newOwner)
         {
-            if (IsHost && SteamUser.GetSteamID().m_SteamID != newOwner.SteamId.m_SteamID)
-                SteamMatchmaking.SetLobbyOwner(LobbyId, newOwner.SteamId);
-            else
-            {
-                Debug.LogWarning("Only the host of the lobby can request change of ownership and cannot change ownership to its self.");
-            }
-        }
-
-        /// <summary>
-        /// Sets the indicated user as the new owner of the lobby
-        /// </summary>
-        /// <param name="newOwner"></param>
-        /// <remarks>
-        /// <para>
-        /// This does not effect the NetworkManager or other networking funcitonality it only changes the ownership of a lobby
-        /// </para>
-        /// </remarks>
-        public void ChangeOwner(int newOwnerIndex)
-        {
-            var newOwner = Members[newOwnerIndex].UserData.SteamId;
-
-            if (IsHost && SteamUser.GetSteamID().m_SteamID != newOwner.m_SteamID)
-                SteamMatchmaking.SetLobbyOwner(LobbyId, newOwner);
-            else
-            {
-                Debug.LogWarning("Only the host of the lobby can request change of ownership and cannot change ownership to its self.");
-            }
+            this[lobbyId].OwnerId = newOwner;
         }
     }
+
 }
 #endif
