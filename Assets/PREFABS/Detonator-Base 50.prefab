@@ -162,7 +162,7 @@ MonoBehaviour:
   smokeBMaterial: {fileID: 0}
   isSmokeBFlipbook: 0
   smokeBFlipbookSize: {x: 1, y: 1}
-  shockwaveMaterial: {fileID: 0}
+  shockwaveMaterial: {fileID: 2100000, guid: 4ac5009ce52fc044baa14776f5e4800f, type: 2}
   isShockwaveFlipbook: 0
   shockwaveFlipbookSize: {x: 1, y: 1}
   sparksMaterial: {fileID: 0}

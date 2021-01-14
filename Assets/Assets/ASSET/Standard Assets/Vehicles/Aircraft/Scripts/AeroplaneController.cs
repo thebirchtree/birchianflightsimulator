@@ -142,7 +142,7 @@ namespace UnityStandardAssets.Vehicles.Aeroplane
         }
 
 
-        private void CalculateForwardSpeed()
+        public void CalculateForwardSpeed()
         {
             // Forward speed is the speed in the planes's forward direction (not the same as its velocity, eg if falling in a stall)
             var localVelocity = transform.InverseTransformDirection(m_Rigidbody.velocity);

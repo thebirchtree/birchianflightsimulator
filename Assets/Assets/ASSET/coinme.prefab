@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 600857691}
   - component: {fileID: 600857692}
   - component: {fileID: 600857694}
+  - component: {fileID: 8120476296625780280}
   m_Layer: 0
   m_Name: coinme
   m_TagString: pickup
@@ -200,6 +201,18 @@ MonoBehaviour:
   onIncrement:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &8120476296625780280
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1104612172148754}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 507bb03f4a40c4d73a6ff3b9eba5de88, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1418609236029774493
 PrefabInstance:
   m_ObjectHideFlags: 0
